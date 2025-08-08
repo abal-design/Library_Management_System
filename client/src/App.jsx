@@ -4,7 +4,10 @@ import NotFound from "./pages/NotFound";
 import Register from "./pages/Auth/Register";
 import Forgot from "./pages/Auth/Forgot";
 import Otp from "./pages/Auth/Otp";
-import ResetPassword from "./pages/Auth/ResetPassword"
+import ResetPassword from "./pages/Auth/ResetPassword";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import UserDashboard from "./pages/User/UserDashboard";
+
 
 function App() {
   return (
@@ -16,6 +19,8 @@ function App() {
         <Route path="/forgot" element={<Forgot/>}/>
         <Route path="/otp" element={<Otp/>}/>
         <Route path="/resetpassword" element={<ResetPassword/>}/>
+        <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
+        <Route path="/user/dashboard" element={<UserDashboard/>}/>
         <Route path="*" element={<NotFound/>}/>
       </Routes>
     </Router>

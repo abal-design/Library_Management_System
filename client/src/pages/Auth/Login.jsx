@@ -1,121 +1,131 @@
-//rafce
 import { useState } from 'react';
-import axios from "axios"
-import Logo from "../../assets/logo.png";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFacebook,
-  faGithub,
-  faXTwitter,
-} from "@fortawesome/free-brands-svg-icons";
-
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import Logo from '../../assets/logo.png';
 
 const Login = () => {
+  const navigate = useNavigate();
 
-  const[userData, setUserData]=useState({
-      email:'',
-      password:''
-    })
-    const handelChange=(e)=>{
-      const{name, value}=e.target;
-      setUserData({
-        ...userData,
-        [name]:value
-      })
+  const [userData, setUserData] = useState({
+    email: '',
+    password: ''
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  // Handle input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUserData({
+      ...userData,
+      [name]: value
+    });
+  };
+
+  // Validate email and password before sending
+  const validateForm = () => {
+    const { email, password } = userData;
+    if (!email || !password) {
+      alert('Please fill all fields.');
+      return false;
     }
-  
-    const handleSubmit=async(e)=>{
-      e.preventDefault()
-      const response= await axios.post('http://localhost:5000/api/auth/login', userData);
-      const token=response.data.token;
-      localStorage.getItem("token", token)
-      alert("Login sucessfully")
-
+    if (!email.includes('@')) {
+      alert('Please enter a valid email address.');
+      return false;
     }
-  
+    if (password.length < 6) {
+      alert('Password must be at least 6 characters.');
+      return false;
+    }
+    return true;
+  };
 
+  // Handle login form submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
+    if (!validateForm()) return;
 
+    setLoading(true);
+    try {
+      const res = await axios.post('http://localhost:5000/api/auth/login', userData);
+
+      const { token, role } = res.data;
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('role', role);
+
+      alert('Login successful');
+
+      // Redirect based on user role
+      if (role === 'Librarian') {
+        navigate('/admin/dashboard');
+      } else if (role === 'Borrower') {
+        navigate('/user/dashboard');
+      } else {
+        alert('Unknown role: Access denied');
+      }
+
+    } catch (err) {
+      console.error('Login Error:', err);
+      alert(err?.response?.data?.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <>
-      <div className="h-screen w-full flex">
-        {/* 1st section */}
-        
-        <div className="w-full sm:w-[50%] flex justify-center items-center px-8 sm:px-20 py-24">
-          {/* log in contain garne div */}
-          <div className="h-full w-full flex flex-col justify-center items-center gap-12">
-            {/* heading wala section */}
-            <img src={Logo} className="h-15 place-items-center" />
-            <div className="text-center justify-center">
-              <h1 className="font-bold text-4xl">Login</h1>
-              <p className="mt-2">
-                Please enter your credentials to log in
-              </p>
-            </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-10 rounded-xl shadow-md w-full max-w-md">
+        <div className="flex flex-col items-center mb-6">
+          <img src={Logo} alt="Logo" className="h-16" />
+          <h2 className="mt-4 text-2xl font-bold text-blue-900">Login to Your Account</h2>
+        </div>
 
-            {/* login form */}
-            <form onSubmit={handleSubmit}
-              action="submit"
-              className="w-full sm:w-96 gap-2 flex flex-col"
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={userData.email}
+            onChange={handleChange}
+            required
+            className="w-full border-2 border-blue-900 p-3 rounded-xl"
+          />
+
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={userData.password}
+            onChange={handleChange}
+            required
+            className="w-full border-2 border-blue-900 p-3 rounded-xl"
+          />
+
+          {/* Forgot Password Button */}
+          <div className="text-left mt-2">
+            <button
+              type="button"
+              onClick={() => navigate("/forgot")}
+              className="text-blue-700 hover:underline text-sm"
             >
-              <div className="flex items-center gap-2">
-                
-                
-                <input
-                  type="email"
-                  placeholder="email"
-                  name="email"
-                  onChange={handelChange}
-                  className="bg-[#ffffff] rounded-2xl border-black h-14 w-full p-2 border-2"
-                />
-              </div>
-
-              <div className="flex items-center gap-2 mt-7">
-                
-                
-                <input
-                  type="text"
-                  placeholder="Password"
-                  name="password"
-                  onChange={handelChange}
-                  className="bg-[#ffffff] rounded-2xl h-14 w-full border-2 border-black p-2"
-                />
-              </div>
-              <button type='submit' className="flex items-center w-32 gap-2 mt-7 cursor-pointer">
-                Forgot Password?
-              </button>
-
-              <button type='submit' className="bg-black h-14 w-full rounded-2xl text-white cursor-pointer hover:bg-[#575757] transition-all duration-200 mt-7">
-                Login
-              </button>
-             
-            </form>
-
-            
-          </div>
-        </div>
-        
-        <div className="w-[50%]  bg-black hidden sm:flex justify-center items-center rounded-4xl flex-col">
-          
-          <div className="flex items-center gap-2">
-            <img src={Logo} className="h-30" />
-            <h1 className='text-white text-center text-2xl bold mt-9 '>
-              Library Management System
-            </h1>
-          </div>
-            <p className='text-white text-m bold my-2'>
-              New to our platform? Sign Up now.
-            </p>
-            <button type='submit' name='signin' className="bg-black h-14 w-50 rounded-2xl text-white cursor-pointer hover:bg-[#272727] transition-all duration-200 border-white border-2 ">
-              SIGN UP
+              Forgot Password?
             </button>
-          
-        </div>
-      </div>
-      
-    </>
-  )
-}
+          </div>
 
-export default Login
+          
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-900 text-white py-3 rounded-xl hover:bg-blue-800 transition disabled:opacity-50"
+          >
+            {loading ? 'Logging in...' : 'LOGIN'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
