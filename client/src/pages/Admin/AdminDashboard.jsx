@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import { useNavigate } from 'react-router-dom';
 import Logo from '../../assets/logo.png';
 import {
@@ -50,11 +50,11 @@ const AdminDashboard= () => {
           
         </div>
         <nav className="flex flex-col gap-4 p-6">
-          <Link to="#" className="hover:bg-blue-800 active:bg-blue-800 px-3 bg-blue-800 py-2 rounded">Dashboard</Link>
+          <Link to="/admin/dashboard" className="hover:bg-blue-800 bg-blue-800 active:bg-blue-800 px-3 py-2 rounded">Dashboard</Link>
           <Link to="/register" className="hover:bg-blue-800 px-3 py-2 rounded">Add User</Link>
-          <Link to="#" className="hover:bg-blue-800 px-3 py-2 rounded">Manage Books</Link>
-          <Link to="#" className="hover:bg-blue-800 px-3 py-2 rounded">Manage Users</Link>
-          <Link to="#" className="hover:bg-blue-800 px-3 py-2 rounded">Reports</Link>
+          <Link to="/admin/manage-book" className="hover:bg-blue-800 px-3 py-2 rounded">Manage Books</Link>
+          <Link to="/admin/manage-user" className="hover:bg-blue-800 px-3 py-2 rounded">Manage Users</Link>
+          <Link to="/admin/reports" className="hover:bg-blue-800 px-3 py-2 rounded">Reports</Link>
           <button
           onClick={handleLogout}
           className="bg-yellow-400 mb-3 fixed bottom-0 text-black px-4 py-2 rounded hover:bg-yellow-300 transition">

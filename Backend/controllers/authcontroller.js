@@ -108,27 +108,63 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-const resetPassword = async (req, res) => {
-  const { otp } = req.body;
-  try {
-    const { newPassword , otp } = req.body;
 
-    const user = await findUserByOtp(otp);
-    if (!user) {
-      return res.status(400).send({ message: "Invalid or expired OTP" });
+
+//reset Password
+const verifyAndResetPassword = async (req, res) => {
+  try {
+    const { otp, newPassword } = req.body;
+
+    if (!otp) {
+      return res.status(400).json({ message: 'OTP is required' });
     }
 
-    user.password = await bcrypt.hash(newPassword, 10);
-    await clearOtpFields(user);
+    const user = await User.findOne({ otp, otpExpires: { $gt: Date.now() } });
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
 
-    res.status(200).send({ message: "Password reset successful" });
-  } catch (err) {
-    res.status(500).send({ message: err.message });
+    if (newPassword) {
+      // Reset password flow
+      user.password = await bcrypt.hash(newPassword, 10);
+      user.otp = null;
+      user.otpExpires = null;
+      await user.save();
+
+      return res.status(200).json({ message: 'Password reset successful' });
+    } else {
+      // OTP verification only
+      return res.status(200).json({ message: 'OTP verified successfully' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 };
 
 
+//reset Password
+// const resetPassword = async (req, res) => {
+//   try {
+//     const { newPassword , otp } = req.body;
 
+//     const user = await findUserByOtp(otp);
+//     if (!user) {
+//       return res.status(400).send({ message: "Invalid or expired OTP" });
+//     }
+
+//     user.password = await bcrypt.hash(newPassword, 10);
+//     await clearOtpFields(user);
+
+//     res.status(200).send({ message: "Password reset successful" });
+//   } catch (err) {
+//     res.status(500).send({ message: err.message });
+//   }
+// };
+
+
+
+
+//verified Otp
 const verifyOtp = async (req, res) => {
   const { otp } = req.body;
   if (!otp) {
@@ -148,7 +184,7 @@ const verifyOtp = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 }
-module.exports = { register, login, forgotPassword, resetPassword , verifyOtp};
+module.exports = { register, login, forgotPassword, verifyOtp, verifyAndResetPassword};
 
 // const register = async (req, res) => {
 //   try {

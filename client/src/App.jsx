@@ -2,11 +2,12 @@ import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import Login from "./pages/Auth/Login";
 import NotFound from "./pages/NotFound";
 import Register from "./pages/Auth/Register";
-import Forgot from "./pages/Auth/Forgot";
-import Otp from "./pages/Auth/Otp";
-import ResetPassword from "./pages/Auth/ResetPassword";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import UserDashboard from "./pages/User/UserDashboard";
+import ManageBook from "./pages/Admin/ManageBook";
+import ManageUser from './pages/Admin/ManageUser'
+import Report from './pages/Admin/Report'
+
 
 
 function App() {
@@ -16,10 +17,13 @@ function App() {
       <Routes>
         <Route path="/" element={<Login/>} />
         <Route path="/register" element={<Register/>}/>
-        <Route path="/forgot" element={<Forgot/>}/>
+        {/* <Route path="/forgot" element={<Forgot/>}/>
         <Route path="/otp" element={<Otp/>}/>
-        <Route path="/resetpassword" element={<ResetPassword/>}/>
+        <Route path="/resetpassword" element={<ResetPassword/>}/> */}
         <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
+        <Route path="/admin/manage-book" element={<ManageBook/>}/>
+        <Route path="/admin/manage-user" element={<ManageUser/>}/>
+        <Route path="/admin/reports" element={<Report/>}/>
         <Route path="/user/dashboard" element={<UserDashboard/>}/>
         <Route path="*" element={<NotFound/>}/>
       </Routes>

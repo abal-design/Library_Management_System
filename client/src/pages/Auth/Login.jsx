@@ -103,7 +103,7 @@ const Login = () => {
             className="w-full border-2 border-blue-900 p-3 rounded-xl"
           />
 
-          {/* Forgot Password Button */}
+          {/* Forgot Password Button
           <div className="text-left mt-2">
             <button
               type="button"
@@ -112,7 +112,7 @@ const Login = () => {
             >
               Forgot Password?
             </button>
-          </div>
+          </div> */}
 
           
           <button
