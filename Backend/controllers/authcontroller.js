@@ -184,7 +184,22 @@ const verifyOtp = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 }
-module.exports = { register, login, forgotPassword, verifyOtp, verifyAndResetPassword};
+
+
+
+
+
+const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password -otp -otpExpires");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { register, login, forgotPassword, verifyOtp, verifyAndResetPassword, getMe};
 
 // const register = async (req, res) => {
 //   try {

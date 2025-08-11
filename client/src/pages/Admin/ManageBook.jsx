@@ -7,8 +7,8 @@ import { FaRegTrashAlt } from "react-icons/fa";
 
 const ManageBook = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("all"); // default tab
-  const [search, setSearch] = useState(""); // FIX: added search state
+  const [activeTab, setActiveTab] = useState("AllBook"); // default tab
+  const [search, setSearch] = useState(""); //  added search state
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -58,38 +58,44 @@ const ManageBook = () => {
             <MenuIcon className="h-6 w-6 text-blue-900 md:hidden" />
             <h2 className="text-xl font-semibold text-blue-900">Manage Books</h2>
           </div>
-          <div className="flex items-center gap-2 border rounded px-3 py-1">
-            <Search className="h-5 w-5 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Search books..."
-              className="outline-none text-sm"
-            />
-          </div>
+          
         </header>
 
         {/* Tabs */}
         <div className="flex items-center justify-between mb-4 p-4">
           <div className="flex space-x-2 bg-gray-200 rounded-lg p-1">
             <button
-              onClick={() => setActiveTab("borrowed")}
+              onClick={() => setActiveTab("AllBook")}
               className={`px-4 py-2 rounded-md text-sm font-medium ${
-                activeTab === "borrowed"
+                activeTab === "AllBook"
                   ? "bg-black text-white"
                   : "bg-transparent text-gray-700"
               }`}
             >
-              Borrowed Books
+              All Books
             </button>
+
+
             <button
-              onClick={() => setActiveTab("overdue")}
+              onClick={() => setActiveTab("AddBook")}
               className={`px-4 py-2 rounded-md text-sm font-medium ${
-                activeTab === "overdue"
+                activeTab === "AddBook"
                   ? "bg-black text-white"
                   : "bg-transparent text-gray-700"
               }`}
             >
-              Overdue Borrowers
+              Add Books
+            </button>
+            
+            <button
+              onClick={() => setActiveTab("UpdateBook")}
+              className={`px-4 py-2 rounded-md text-sm font-medium ${
+                activeTab === "UpdateBook"
+                  ? "bg-black text-white"
+                  : "bg-transparent text-gray-700"
+              }`}
+            >
+              Update Books
             </button>
           </div>
 

@@ -69,7 +69,7 @@ const Signup = () => {
         <header className="bg-white shadow-md p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <MenuIcon className="h-6 w-6 text-blue-900 md:hidden" />
-            <h2 className="text-xl font-semibold text-blue-900">Admin Dashboard</h2>
+            <h2 className="text-xl font-semibold text-blue-900">Add User</h2>
           </div>
           <div className="text-sm text-gray-600 hidden md:block">Welcome, <br/> Add member 👨‍💻</div>
         </header>

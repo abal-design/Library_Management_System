@@ -7,7 +7,8 @@ const borrowRoutes = require('./routes/borrowRoutes');
 const { errorHandler } = require('./middleware/errorMiddleware');
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
-const User = require("./models/userModel"); // import your user model
+const userRoutes = require("./routes/userRoutes"); // import your user model
+const reportRoutes = require('./routes/reportRoutes');
 
 dotenv.config();
 connectDB();
@@ -17,12 +18,17 @@ app.use(express.json());
 app.use(cors());
 
 // Routes
+
+
+app.use('/api/reports', reportRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/books', bookRoutes);
 app.use('/api/borrow', borrowRoutes);
+app.use('/api', userRoutes);
 
 // Global error handler
 app.use(errorHandler);
+
 
 
 
