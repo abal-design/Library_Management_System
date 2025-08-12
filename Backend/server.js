@@ -10,6 +10,8 @@ const bcrypt = require("bcryptjs");
 const userRoutes = require("./routes/userRoutes"); // import your user model
 const reportRoutes = require('./routes/reportRoutes');
 
+
+
 dotenv.config();
 connectDB();
 

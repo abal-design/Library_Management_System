@@ -1,25 +1,30 @@
 const Book = require('../models/bookModel');
 
-getBooks = async (req, res) => {
+const getBooks = async (req, res) => {
   const books = await Book.find();
   res.json(books);
 };
 
-createBook = async (req, res) => {
-  const { title, author, isbn, quantity } = req.body;
-  const bookExists = await Book.findOne({ isbn });
-  if (bookExists) return res.status(400).json({ message: 'Book already exists' });
-
-  const book = await Book.create({ title, author, isbn, quantity, available: quantity });
-  res.status(201).json(book);
+const createBook = async (req, res) => {
+  try {
+    const { title, author, isbn, category, quantity, available } = req.body;
+    if (!title || !author || !isbn || !category || quantity == null || available == null) {
+      return res.status(400).json({ message: "Please provide all required fields" });
+    }
+    const book = new Book({ title, author, isbn, category, quantity, available });
+    await book.save();
+    res.status(201).json(book);
+  } catch (error) {
+    console.error("Error creating book:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 };
-
-updateBook = async (req, res) => {
+const updateBook = async (req, res) => {
   const book = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true });
   res.json(book);
 };
 
-deleteBook = async (req, res) => {
+const deleteBook = async (req, res) => {
   await Book.findByIdAndDelete(req.params.id);
   res.json({ message: 'Book removed' });
 };

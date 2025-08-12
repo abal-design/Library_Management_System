@@ -4,29 +4,28 @@ import { Link, useNavigate } from "react-router-dom";
 import Logo from "../../assets/logo.png"; // adjust path to your logo
 import { MenuIcon } from "@heroicons/react/outline"; // example icon
 
-const BooksPage = () => {
+const DeleteBook = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dateTime, setDateTime] = useState(new Date());
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const config = token
-          ? { headers: { Authorization: `Bearer ${token}` } }
-          : {};
-        const res = await axios.get("/api/books", config);
-        setBooks(res.data);
-      } catch (error) {
-        console.error("Error fetching books:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Fetch all books
+  const fetchBooks = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      const res = await axios.get("/api/books", config);
+      setBooks(res.data);
+    } catch (error) {
+      console.error("Error fetching books:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchBooks();
 
     // Update date & time every second
@@ -34,9 +33,26 @@ const BooksPage = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Logout handler
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
+  };
+
+  // Delete book handler
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this book?")) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      await axios.delete(`/api/books/${id}`, config);
+      setBooks((prev) => prev.filter((book) => book._id !== id));
+      alert("Book deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting book:", error);
+      alert("Failed to delete book.");
+    }
   };
 
   if (loading) {
@@ -58,10 +74,10 @@ const BooksPage = () => {
           <Link to="/register" className="hover:bg-blue-800 px-3 py-2 rounded">
             Add User
           </Link>
-          <Link to="/admin/manage-book" className="hover:bg-blue-800 bg-blue-800 px-3 py-2 rounded">
+          <Link to="/admin/manage-book" className="hover:bg-blue-800 px-3 py-2 rounded">
             Manage Books
           </Link>
-          <Link to="/admin/manage-user" className="hover:bg-blue-800 px-3 py-2 rounded">
+          <Link to="/admin/manage-user" className="hover:bg-blue-800 bg-blue-800 px-3 py-2 rounded">
             Manage Users
           </Link>
           <Link to="/admin/reports" className="hover:bg-blue-800 px-3 py-2 rounded">
@@ -82,45 +98,44 @@ const BooksPage = () => {
         <header className="bg-white shadow-md p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <MenuIcon className="h-6 w-6 text-blue-900 md:hidden" />
-            <h2 className="text-xl font-semibold text-blue-900">Manage All Books</h2>
+            <h2 className="text-xl font-semibold text-blue-900">Delete Books</h2>
           </div>
           <div className="text-sm text-gray-600">
             {dateTime.toLocaleDateString()} {dateTime.toLocaleTimeString()}
           </div>
         </header>
 
-          {/* Right: CRUD Buttons */}
-          <div className="flex gap-2 mt-2 p-4">
-            <button
-              onClick={() => navigate("/admin/manage-book")}
-              className="bg-gray-600 text-gray-100 hover:bg-yellow-300 px-3 py-1 rounded transition"
-            >
-              📖 View All
-            </button>
+        {/* CRUD Buttons */}
+        <div className="flex gap-2 mt-2 p-4">
+          <button
+            onClick={() => navigate("/admin/manage-book")}
+            className="bg-white text-gray-800 hover:bg-yellow-300 px-3 py-1 rounded transition"
+          >
+            📖 View All
+          </button>
+          <button
+            onClick={() => navigate("/admin/add-book")}
+            className="bg-white text-gray-800 hover:bg-yellow-300 px-3 py-1 rounded transition"
+          >
+            ➕ Add Book
+          </button>
+          <button
+            onClick={() => navigate("/admin/update-book")}
+            className="bg-white text-gray-800 hover:bg-yellow-300 px-3 py-1 rounded transition"
+          >
+            ✏️ Update
+          </button>
+          <button
+            onClick={() => navigate("/admin/delete-book")}
+            className="bg-gray-600 text-gray-100 hover:bg-yellow-300 px-3 py-1 rounded transition"
+          >
+            🗑️ Delete
+          </button>
+        </div>
 
-            <button
-              onClick={() => navigate("/admin/add-book")}
-              className=" hover:bg-yellow-300 bg-white text-gray-800 px-3 py-1 rounded transition"
-            >
-              ➕ Add Book
-            </button>
-            <button
-              onClick={() => navigate("/admin/update-book")}
-              className="bg-white text-gray-800 hover:bg-yellow-300 px-3 py-1 rounded transition"
-            >
-              ✏️ Update
-            </button>
-            <button
-              onClick={() => navigate("/admin/delete-book")}
-              className="bg-white text-gray-800 hover:bg-yellow-300 px-3 py-1 rounded transition"
-            >
-              🗑️ Delete
-            </button>
-          </div>
-
-        {/* Book Table */}
+        {/* Books Table */}
         <div className="p-4">
-          {/* <h2 className="text-2xl font-bold mb-4">📚 All Books</h2> */}
+          
           <div className="overflow-x-auto">
             <table className="min-w-full border border-gray-300 shadow-md rounded-lg">
               <thead>
@@ -132,6 +147,7 @@ const BooksPage = () => {
                   <th className="border p-2">ISBN</th>
                   <th className="border p-2">Quantity</th>
                   <th className="border p-2">Available</th>
+                  <th className="border p-2">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -145,11 +161,19 @@ const BooksPage = () => {
                       <td className="border p-2">{book.isbn}</td>
                       <td className="border p-2 text-center">{book.quantity}</td>
                       <td className="border p-2 text-center">{book.available}</td>
+                      <td className="border p-2 text-center">
+                        <button
+                          onClick={() => handleDelete(book._id)}
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                        >
+                          Delete
+                        </button>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center p-4 text-gray-500">
+                    <td colSpan="8" className="text-center p-4 text-gray-500">
                       No books found.
                     </td>
                   </tr>
@@ -163,8 +187,4 @@ const BooksPage = () => {
   );
 };
 
-export default BooksPage;
-
-
-
-
+export default DeleteBook;

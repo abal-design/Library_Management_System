@@ -48,19 +48,20 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', userData);
+      const res = await axios.post('/api/auth/login', userData);
 
-      const { token, role } = res.data;
+      const { token, role, user } = res.data;
 
       localStorage.setItem('token', token);
-      localStorage.setItem('role', role);
+      localStorage.setItem('role', role.toLowerCase());
+      localStorage.setItem('user', JSON.stringify(user));
 
       alert('Login successful');
 
-      // Redirect based on user role
-      if (role === 'Librarian') {
+      // Redirect based on user role (make sure roles are lowercase)
+      if (role.toLowerCase() === 'librarian') {
         navigate('/admin/dashboard');
-      } else if (role === 'Borrower') {
+      } else if (role.toLowerCase() === 'borrower') {
         navigate('/user/dashboard');
       } else {
         alert('Unknown role: Access denied');
@@ -103,18 +104,6 @@ const Login = () => {
             className="w-full border-2 border-blue-900 p-3 rounded-xl"
           />
 
-          {/* Forgot Password Button
-          <div className="text-left mt-2">
-            <button
-              type="button"
-              onClick={() => navigate("/forgot")}
-              className="text-blue-700 hover:underline text-sm"
-            >
-              Forgot Password?
-            </button>
-          </div> */}
-
-          
           <button
             type="submit"
             disabled={loading}
@@ -129,3 +118,17 @@ const Login = () => {
 };
 
 export default Login;
+
+
+
+
+{/* Forgot Password Button
+          <div className="text-left mt-2">
+            <button
+              type="button"
+              onClick={() => navigate("/forgot")}
+              className="text-blue-700 hover:underline text-sm"
+            >
+              Forgot Password?
+            </button>
+          </div> */}

@@ -1,58 +1,84 @@
 import React, { useEffect, useState } from "react";
 import Logo from "../../assets/logo.png";
+import defaultAvatar from "../../assets/DefaultAvatar.png";
 import { Link, useNavigate } from "react-router-dom";
 import { MenuIcon } from "@heroicons/react/outline";
 import axios from "axios";
 
+
+const API_BASE_URL = "http://localhost:5000"; // Change as needed
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [stats, setStats] = useState(null);
+
+  const [stats, setStats] = useState({
+    totalBooks: 0,
+    registeredUsers: 0,
+    booksBorrowed: 0,
+    overdueReturns: 0,
+  });
+  const [admin, setAdmin] = useState({
+    name: "",
+    email: "",
+    profilePicture: "",
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [username, setUsername] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
 
-  // Fetch dashboard stats + user info on mount
   useEffect(() => {
     async function fetchData() {
+      setLoading(true);
+      setError("");
       try {
         const token = localStorage.getItem("token");
         if (!token) {
           navigate("/login");
           return;
         }
-
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
-        // Fetch dashboard stats
-        const statsResponse = await axios.get("/api/reports/stats", config);
+        // Fetch stats
+        const statsResponse = await axios.get(
+          `${API_BASE_URL}/api/reports/stats`,
+          config
+        );
         setStats(statsResponse.data);
 
-        // Fetch logged-in user info
-        const userResponse = await axios.get("/api/auth/me", config);
-        setUsername(userResponse.data.name);
-
+        // Fetch admin user info
+        const userResponse = await axios.get(
+          `${API_BASE_URL}/api/auth/me`,
+          config
+        );
+        setAdmin(userResponse.data);
       } catch (err) {
         setError("Failed to load data.");
       } finally {
         setLoading(false);
       }
     }
+
     fetchData();
   }, [navigate]);
 
-  // Update time every second
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  if (loading)
+    return (
+      <div className="p-8 text-center text-gray-600 font-semibold">Loading...</div>
+    );
+  if (error)
+    return (
+      <div className="p-8 text-center text-red-600 font-semibold">{error}</div>
+    );
 
   return (
     <div className="min-h-screen flex bg-gray-100 text-gray-800">
@@ -110,7 +136,7 @@ const Dashboard = () => {
                 Dashboard
               </h2>
               <p className="text-sm text-gray-600">
-                Welcome back, <strong>{username || "Admin"}</strong> 👋
+                Welcome back, <strong>{admin.name || "Admin"}</strong> 👋
               </p>
             </div>
           </div>
@@ -118,29 +144,44 @@ const Dashboard = () => {
             {currentTime.toLocaleString()}
           </div>
         </header>
+        {/* Main content */}
 
-        <div className="p-6 flex-1 overflow-auto">
-          {loading ? (
-            <p className="text-center text-gray-600">Loading dashboard stats...</p>
-          ) : error ? (
-            <p className="text-center text-red-600">{error}</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded shadow text-center">
-                <h3 className="text-xl font-semibold mb-2">Total Users</h3>
-                <p className="text-3xl font-bold">{stats.totalUsers}</p>
-              </div>
-              <div className="bg-white p-6 rounded shadow text-center">
-                <h3 className="text-xl font-semibold mb-2">Total Books</h3>
-                <p className="text-3xl font-bold">{stats.totalBooks}</p>
-              </div>
-              <div className="bg-white p-6 rounded shadow text-center">
-                <h3 className="text-xl font-semibold mb-2">Books Borrowed</h3>
-                <p className="text-3xl font-bold">{stats.borrowedBooks}</p>
-              </div>
-            </div>
-          )}
+        {/* Admin info block below header */}
+        <div className="p-6 border-b border-blue-700 text-center bg-white rounded-md shadow-md mx-4 md:mx-8 mt-4">
+          <img
+            src={admin.profilePicture || defaultAvatar}
+            alt={admin.name || "Admin"}
+            className="h-20 w-20 rounded-full mx-auto mb-3 object-cover border border-white"
+            onError={(e) => (e.currentTarget.src = defaultAvatar)}
+          />
+          <h2 className="text-xl font-bold">{admin.name || "Admin"}</h2>
+          <p className="text-sm">{admin.email}</p>
         </div>
+
+        {/* Stats Section */}
+        <section className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white rounded shadow p-6 text-center">
+            <h3 className="text-lg font-bold mb-2">Total Books</h3>
+            <p className="text-3xl font-extrabold text-blue-900">{stats.totalBooks}</p>
+          </div>
+          <div className="bg-white rounded shadow p-6 text-center">
+            <h3 className="text-lg font-bold mb-2">Registered Users</h3>
+            <p className="text-3xl font-extrabold text-blue-900">{stats.registeredUsers}</p>
+          </div>
+          <div className="bg-white rounded shadow p-6 text-center">
+            <h3 className="text-lg font-bold mb-2">Books Borrowed</h3>
+            <p className="text-3xl font-extrabold text-blue-900">{stats.booksBorrowed}</p>
+          </div>
+          <div className="bg-white rounded shadow p-6 text-center">
+            <h3 className="text-lg font-bold mb-2">Overdue Returns</h3>
+            <p className="text-3xl font-extrabold text-blue-900">{stats.overdueReturns}</p>
+          </div>
+        </section>
+      
+
+        
+
+        
       </main>
     </div>
   );
