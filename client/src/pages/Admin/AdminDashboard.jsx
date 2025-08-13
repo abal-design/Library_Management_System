@@ -5,8 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { MenuIcon } from "@heroicons/react/outline";
 import axios from "axios";
 
+const API_BASE_URL = "http://localhost:5000"; // Adjust if needed
 
-const API_BASE_URL = "http://localhost:5000"; // Change as needed
 const Dashboard = () => {
   const navigate = useNavigate();
 
@@ -24,7 +24,6 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -32,37 +31,51 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchData = async () => {
       setLoading(true);
       setError("");
+    
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+    
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+    
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/login");
-          return;
+        // Fetch both at the same time
+        const [statsRes, userRes] = await Promise.allSettled([
+          axios.get(`${API_BASE_URL}/api/reports/stats`, config),
+          axios.get(`${API_BASE_URL}/api/auth/me`, config),
+        ]);
+      
+        // Handle stats
+        if (statsRes.status === "fulfilled") {
+          setStats(statsRes.value.data);
+        } else {
+          console.error("Stats API error:", statsRes.reason?.response?.data || statsRes.reason?.message);
         }
-        const config = { headers: { Authorization: `Bearer ${token}` } };
-
-        // Fetch stats
-        const statsResponse = await axios.get(
-          `${API_BASE_URL}/api/reports/stats`,
-          config
-        );
-        setStats(statsResponse.data);
-
-        // Fetch admin user info
-        const userResponse = await axios.get(
-          `${API_BASE_URL}/api/auth/me`,
-          config
-        );
-        setAdmin(userResponse.data);
+      
+        // Handle admin info
+        if (userRes.status === "fulfilled") {
+          setAdmin(userRes.value.data);
+        } else {
+          console.error("User API error:", userRes.reason?.response?.data || userRes.reason?.message);
+        }
+      
+        // If both failed
+        if (statsRes.status === "rejected" && userRes.status === "rejected") {
+          setError("Failed to load data.");
+        }
       } catch (err) {
-        setError("Failed to load data.");
+        console.error("Unexpected dashboard error:", err);
+        setError("Unexpected error occurred.");
       } finally {
         setLoading(false);
       }
-    }
-
+    };
+  
     fetchData();
   }, [navigate]);
 
@@ -73,8 +86,11 @@ const Dashboard = () => {
 
   if (loading)
     return (
-      <div className="p-8 text-center text-gray-600 font-semibold">Loading...</div>
+      <div className="p-8 text-center text-gray-600 font-semibold">
+        Loading...
+      </div>
     );
+
   if (error)
     return (
       <div className="p-8 text-center text-red-600 font-semibold">{error}</div>
@@ -132,9 +148,7 @@ const Dashboard = () => {
           <div className="flex items-center gap-3">
             <MenuIcon className="h-6 w-6 text-blue-900 md:hidden" />
             <div>
-              <h2 className="text-xl font-semibold text-blue-900">
-                Dashboard
-              </h2>
+              <h2 className="text-xl font-semibold text-blue-900">Dashboard</h2>
               <p className="text-sm text-gray-600">
                 Welcome back, <strong>{admin.name || "Admin"}</strong> 👋
               </p>
@@ -144,9 +158,8 @@ const Dashboard = () => {
             {currentTime.toLocaleString()}
           </div>
         </header>
-        {/* Main content */}
 
-        {/* Admin info block below header */}
+        {/* Admin Info */}
         <div className="p-6 border-b border-blue-700 text-center bg-white rounded-md shadow-md mx-4 md:mx-8 mt-4">
           <img
             src={admin.profilePicture || defaultAvatar}
@@ -158,36 +171,40 @@ const Dashboard = () => {
           <p className="text-sm">{admin.email}</p>
         </div>
 
-        {/* Stats Section */}
+        {/* Stats */}
         <section className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white rounded shadow p-6 text-center">
             <h3 className="text-lg font-bold mb-2">Total Books</h3>
-            <p className="text-3xl font-extrabold text-blue-900">{stats.totalBooks}</p>
+            <p className="text-3xl font-extrabold text-blue-900">
+              {stats.totalBooks}
+            </p>
           </div>
           <div className="bg-white rounded shadow p-6 text-center">
             <h3 className="text-lg font-bold mb-2">Registered Users</h3>
-            <p className="text-3xl font-extrabold text-blue-900">{stats.registeredUsers}</p>
+            <p className="text-3xl font-extrabold text-blue-900">
+              {stats.registeredUsers}
+            </p>
           </div>
           <div className="bg-white rounded shadow p-6 text-center">
             <h3 className="text-lg font-bold mb-2">Books Borrowed</h3>
-            <p className="text-3xl font-extrabold text-blue-900">{stats.booksBorrowed}</p>
+            <p className="text-3xl font-extrabold text-blue-900">
+              {stats.booksBorrowed}
+            </p>
           </div>
           <div className="bg-white rounded shadow p-6 text-center">
             <h3 className="text-lg font-bold mb-2">Overdue Returns</h3>
-            <p className="text-3xl font-extrabold text-blue-900">{stats.overdueReturns}</p>
+            <p className="text-3xl font-extrabold text-blue-900">
+              {stats.overdueReturns}
+            </p>
           </div>
         </section>
-      
-
-        
-
-        
       </main>
     </div>
   );
 };
 
 export default Dashboard;
+
 
 
 

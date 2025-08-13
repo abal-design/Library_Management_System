@@ -199,7 +199,33 @@ const getMe = async (req, res) => {
   }
 };
 
-module.exports = { register, login, forgotPassword, verifyOtp, verifyAndResetPassword, getMe};
+const updateUserProfile = async (req, res) => {
+  try {
+    const { name, email, phone, address } = req.body; // adjust fields as needed
+
+    // Find and update user
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { name, email, phone, address },
+      { new: true, runValidators: true, select: "-password -otp -otpExpires" }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      message: "Profile updated successfully",
+      user,
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+module.exports = { register, login, forgotPassword, verifyOtp, verifyAndResetPassword, getMe, updateUserProfile};
 
 // const register = async (req, res) => {
 //   try {

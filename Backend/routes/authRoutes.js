@@ -7,7 +7,6 @@ const { register, login , verifyOtp, resetPassword , forgotPassword  } = require
 router.post('/register', register);
 router.post('/login', login);
 router.post('/forgotPassword', forgotPassword);
-
 // router.get("/users", getUsers);
 
 // router.put('/resetPassword', resetPassword);

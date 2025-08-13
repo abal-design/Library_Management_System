@@ -26,7 +26,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/books', bookRoutes);
 app.use('/api/borrow', borrowRoutes);
-app.use('/api', userRoutes);
+app.use('/api/users', userRoutes);
 
 // Global error handler
 app.use(errorHandler);
