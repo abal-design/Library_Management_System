@@ -68,28 +68,14 @@ const DeleteBook = () => {
           <h1 className="text-2xl font-bold text-center">LMS Admin</h1>
         </div>
         <nav className="flex flex-col gap-4 p-6 flex-1">
-          <Link to="/admin/dashboard" className="hover:bg-blue-800 px-3 py-2 rounded">
-            Dashboard
-          </Link>
-          <Link to="/register" className="hover:bg-blue-800 px-3 py-2 rounded">
-            Add User
-          </Link>
-          <Link to="/admin/manage-book" className="hover:bg-blue-800 px-3 py-2 rounded">
-            Manage Books
-          </Link>
-          <Link to="/admin/manage-user" className="hover:bg-blue-800 bg-blue-800 px-3 py-2 rounded">
-            Manage Users
-          </Link>
-          <Link to="/admin/reports" className="hover:bg-blue-800 px-3 py-2 rounded">
-            Reports
-          </Link>
-          <button
-            onClick={handleLogout}
-            className="bg-yellow-400 text-black mb-3 fixed bottom-0 px-4 py-2 rounded hover:bg-yellow-300 transition mt-auto"
-          >
-            Logout
-          </button>
+          <Link to="/admin/dashboard" className="hover:bg-blue-800 px-3 py-2 rounded"> Dashboard</Link>
+          <Link to="/register" className="hover:bg-blue-800 px-3 py-2 rounded">Add User</Link>
+          <Link to="/admin/manage-book" className="hover:bg-blue-800 bg-blue-800 px-3 py-2 rounded"> Manage Books</Link>
+          <Link to="/admin/manage-user" className="hover:bg-blue-800 px-3 py-2 rounded"> Manage Users </Link>
+          <Link to="/admin/reports" className="hover:bg-blue-800 px-3 py-2 rounded">Reports</Link>
+          <Link to="/admin/reset-password" className="hover:bg-blue-800 px-3 py-2 rounded">Reset User Password</Link>
         </nav>
+          
       </aside>
 
       {/* Main Content */}

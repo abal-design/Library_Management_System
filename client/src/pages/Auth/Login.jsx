@@ -91,7 +91,7 @@ const Login = () => {
             value={userData.email}
             onChange={handleChange}
             required
-            className="w-full border-2 border-blue-900 p-3 rounded-xl"
+            className="w-full border-2 text-black border-blue-900 p-3 rounded-xl"
           />
 
           <input
@@ -101,7 +101,7 @@ const Login = () => {
             value={userData.password}
             onChange={handleChange}
             required
-            className="w-full border-2 border-blue-900 p-3 rounded-xl"
+            className="w-full border-2 text-black border-blue-900 p-3 rounded-xl"
           />
 
           <button

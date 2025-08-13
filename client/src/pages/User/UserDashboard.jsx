@@ -1,83 +1,119 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import Logo from '../../assets/logo.png';
-import {
-  BookOpenIcon,
-  UsersIcon,
-  ClipboardCheckIcon,
-  ExclamationIcon,
-  MenuIcon,
-} from '@heroicons/react/outline';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
+import axios from "axios";
+import PromotionCarousel from "./PromotionCarousel"; // import the carousel component
 
+const UserDashboard = () => {
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [userName, setUserName] = useState("Student"); // Placeholder name, can decode from token
 
-const UserDashboard= () => {
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const config = token
+          ? { headers: { Authorization: `Bearer ${token}` } }
+          : {};
+        const res = await axios.get("/api/books", config);
+        setBooks(res.data);
+      } catch (error) {
+        console.error("Error fetching books:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const navigate = useNavigate();
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate('/');
-  };
+    fetchBooks();
+  }, []);
+
   return (
-    <div className="min-h-screen flex bg-gray-100 text-gray-800">
-      {/* Header */}
-      <aside className="w-64 bg-blue-900 text-white hidden md:flex flex-col">
-        <div className="p-6 border-b border-blue-700">
-          <img src={Logo} alt="Logo" className="h-16 ml-16 items-center" />
-          <h1 className="text-2xl font-bold ml-9">LMS User</h1>
-          
-        </div>
-        <nav className="flex flex-col gap-4 p-6">
-          <Link to="#" className="hover:bg-blue-800 px-3 bg-blue-800 py-2 rounded">Dashboard</Link>
-          <Link to="#" className="hover:bg-blue-800 px-3 py-2 rounded">BookLibrary</Link>
-          <Link to="#" className="hover:bg-blue-800 px-3 py-2 rounded">ReturnBook</Link>
-          <button
-          onClick={handleLogout}
-          className="bg-yellow-400 mb-3 fixed bottom-0 text-black px-4 py-2 rounded hover:bg-yellow-300 transition">
-          Logout
-          </button>
-        </nav>
-      </aside>
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      {/* Navbar */}
+      <Navbar />
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="bg-white shadow-md p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <MenuIcon className="h-6 w-6 text-blue-900 md:hidden" />
-            <h2 className="text-xl font-semibold text-blue-900">User Dashboard</h2>
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-blue-900 to-indigo-800 text-white py-20 text-center">
+        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          Welcome back, {userName}!
+        </h1>
+        <p className="max-w-2xl mx-auto text-lg md:text-xl text-gray-200">
+          Explore thousands of books, stay updated with library events, and enjoy
+          our curated collections for college students.
+        </p>
+      </section>
+
+      {/* Promotions / Announcements Carousel */}
+      <PromotionCarousel />
+
+      {/* Featured Books */}
+      <main className="flex-grow max-w-7xl mx-auto px-6 py-12">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">Featured Books</h2>
+          <a
+            href="/user/book"
+            className="text-blue-900 hover:underline font-medium"
+          >
+            View All →
+          </a>
+        </div>
+
+        {loading ? (
+          <p className="text-center text-gray-600">Loading books...</p>
+        ) : (
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {books.slice(0, 8).map((book) => (
+              <div
+                key={book._id}
+                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition transform hover:-translate-y-1"
+              >
+                {/* Book Cover */}
+                <div className="h-48 w-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                  {book.coverImage ? (
+                    <img
+                      src={book.coverImage}
+                      alt={book.title}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-gray-400 text-4xl">📚</span>
+                  )}
+                </div>
+
+                <div className="p-5">
+                  <h3 className="text-lg font-semibold text-gray-900">{book.title}</h3>
+                  <p className="text-sm text-gray-600">{book.author}</p>
+                  <p className="text-xs text-gray-500 mb-4">{book.category || "N/A"}</p>
+                  <button className="w-full bg-blue-900 text-white py-2 rounded-md hover:bg-blue-800 transition">
+                    Borrow Now
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="text-sm text-gray-600 hidden md:block">Welcome back, User 👋</div>
-        </header>
-
-        {/* Main Content */}
-        <div className="p-6">
-          <h2 className="text-3xl font-semibold text-blue-900 mb-4">Welcome, User!</h2>
-
-          {/* Borrowed Books Section */}
-          <section className="bg-white shadow-md rounded-lg p-6 mt-4">
-            <h3 className="text-xl font-bold text-blue-800 mb-2">Your Borrowed Books</h3>
-            {/* Placeholder for now */}
-            <p className="text-gray-600">You have not borrowed any books yet.</p>
-          </section>
-
-          {/* Profile Information */}
-          <section className="bg-white shadow-md rounded-lg p-6 mt-6">
-            <h3 className="text-xl font-bold text-blue-800 mb-2">Profile Information</h3>
-            <ul className="text-gray-700">
-              <li><strong>Name:</strong> John Doe</li>
-              <li><strong>Email:</strong> johndoe@example.com</li>
-              <li><strong>Role:</strong> User</li>
-            </ul>
-          </section>
-        </div>
-
-        {/* Footer */}
-        <footer className="mt-auto text-center py-4 text-sm bg-gray-900 text-white">
-          &copy; 2025 Library Management System | User Panel
-        </footer>
+        )}
       </main>
+
+      {/* Reading Club / Info Section */}
+      <section className="bg-indigo-100 py-16 text-center">
+        <h2 className="text-3xl font-bold text-gray-800 mb-4">
+          Join Our College Reading Club
+        </h2>
+        <p className="max-w-2xl mx-auto text-gray-700 mb-4">
+          Enhance your learning experience and explore curated reading lists,
+          discussions, and workshops.
+        </p>
+        <p className="max-w-2xl mx-auto text-gray-600">
+          ⚠️ Membership is granted by the library administrator. Please contact
+          the library if you wish to join.
+        </p>
+      </section>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
-}
+};
+
 export default UserDashboard;

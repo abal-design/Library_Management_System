@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { register, login , verifyOtp, resetPassword , forgotPassword  } = require('../controllers/authcontroller');
+const { register, login , verifyOtp, forgotPassword  } = require('../controllers/authcontroller');
 // const {getUsers} = require('../controllers/usercontroller')
 
 router.post('/register', register);

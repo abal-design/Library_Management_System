@@ -4,6 +4,8 @@ import NotFound from "./pages/NotFound";
 import Register from "./pages/Auth/Register";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import UserDashboard from "./pages/User/UserDashboard";
+import Book from "./pages/User/Book";
+import AboutUs from './pages/User/AboutUs'
 import ManageBook from "./pages/Admin/ManageBook";
 import ManageUser from './pages/Admin/ManageUser'
 import Report from './pages/Admin/Report'
@@ -11,6 +13,7 @@ import AddBook from './pages/Admin/AddBook'
 import UpdateBook from './pages/Admin/UpdateBook'
 import DeleteBook from './pages/Admin/DeleteBook'
 import axios from 'axios';
+import ResetPassword from "./pages/Auth/ResetPassword";
 
 
 
@@ -33,7 +36,10 @@ function App() {
         <Route path="/admin/manage-user" element={<ManageUser/>}/>
         <Route path="/admin/reports" element={<Report/>}/>
         <Route path="/user/dashboard" element={<UserDashboard/>}/>
+        <Route path="/user/book" element={<Book/>}/>
+        <Route path="/user/aboutus" element={<AboutUs/>}/>
         <Route path="/admin/add-book" element={<AddBook/>}/>
+        <Route path="/admin/reset-password" element={<ResetPassword/>}/>
         <Route path="/admin/delete-book" element={<DeleteBook/>}/>
         <Route path="/admin/update-book" element={<UpdateBook/>}/>
         <Route path="*" element={<NotFound/>}/>

@@ -21,7 +21,7 @@ app.use(cors());
 
 // Routes
 
-
+app.use('/uploads', express.static('uploads'));
 app.use('/api/reports', reportRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/books', bookRoutes);

@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/userModel'); // <--- add this line to import your User schema/model
-const { getMe, updateUserProfile } = require("../controllers/authcontroller");
+const { getMe } = require("../controllers/authcontroller");
 const { protect } = require('../middleware/authMiddleware');
+const {updateUserProfile} = require('../controllers/usercontroller');
 
 
 router.get('/me', protect, async (req, res) => {
@@ -27,7 +28,7 @@ router.get('/me', protect, async (req, res) => {
 //   }
 // });
 
-
+router.put('/reset-password', protect, authorize('librarian'), resetUserPassword);
 router.get('/me', protect, getMe);
 router.put('/me', protect, updateUserProfile);
 

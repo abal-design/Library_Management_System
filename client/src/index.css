@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@plugin "daisyui"{
+theme: light;
+} 
 
 * {
   /* margin: 0;
