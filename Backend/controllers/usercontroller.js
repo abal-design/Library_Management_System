@@ -33,6 +33,12 @@ const resetUserPassword = async (req, res) => {
   }
 };
 
+const updateUser = async (req, res) => {
+  res.status(501).json({ message: "Not implemented" });
+};
+const deleteUser = async (req, res) => {
+  res.status(501).json({ message: "Not implemented" });
+};
 
+module.exports = { getUsers, resetUserPassword, deleteUser, updateUser };
 
-module.exports = {getUsers, resetUserPassword}

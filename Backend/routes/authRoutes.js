@@ -1,17 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const { protect, authorize } = require('../middleware/authMiddleware');
+const upload = require('../middleware/upload'); // shared upload
+const { register, login, verifyOtp, resetUserPassword } = require('../controllers/authcontroller');
 
-const { register, login , verifyOtp, forgotPassword  } = require('../controllers/authcontroller');
-// const {getUsers} = require('../controllers/usercontroller')
-
-router.post('/register', register);
+// Routes
+router.post('/register', upload.single('profileImage'), register); // Multer added here
 router.post('/login', login);
-router.post('/forgotPassword', forgotPassword);
-// router.get("/users", getUsers);
-
-// router.put('/resetPassword', resetPassword);
-router.post('/verifyOtp' , verifyOtp)
-
-
+router.post('/verifyOtp', verifyOtp);
+router.put('/reset-password', protect, authorize('librarian'), resetUserPassword);
 
 module.exports = router;

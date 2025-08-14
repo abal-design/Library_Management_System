@@ -7,7 +7,7 @@ const nodemailer = require("nodemailer");
 // Generate JWT token including user id and role
 const generateToken = (user) => 
   jwt.sign(
-    { id: user._id, role: user.role },  // include role here
+    { id: user._id, role: user.role },  // includes role
     process.env.JWT_SECRET, 
     { expiresIn: '30d' }
   );
@@ -69,42 +69,88 @@ const register = async (req, res) => {
 // Login controller
 const login = async (req, res) => {
   try {
-    const { email, password} = req.body;
-    const user = await User.findOne({ email });
+    const { email, password } = req.body;
 
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const token = generateToken(user);
-      res.json({ token, role: user.role, userId: user._id });
-    } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
     }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    res.status(200).json({
+      token,
+      role: user.role,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Login error:', err);
+    res.status(500).json({ message: 'Server error during login' });
   }
 };
 
-// Forgot password controller
-const forgotPassword = async (req, res) => {
-  try {
-    const { email } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).send({ message: "Email not found" });
 
-    user.otp = otpUtils.generateOtp();
-    user.otpExpires = Date.now() + 10 * 60 * 1000;
+
+
+// const login = async (req, res) => {
+//   try {
+//     const { email, password} = req.body;
+//     const user = await User.findOne({ email });
+
+//     if (user && (await bcrypt.compare(password, user.password))) {
+//       const token = generateToken(user);
+//       res.json({ token, role: user.role, userId: user._id });
+//     } else {
+//       res.status(401).json({ message: 'Invalid email or password' });
+//     }
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// };
+
+// resetUserPassword controller
+const resetUserPassword = async (req, res) => {
+  try {
+    const { userId, newPassword } = req.body;
+
+    if (!userId || !newPassword) {
+      return res.status(400).json({ message: 'User ID and new password are required' });
+    }
+
+    // Find the target user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+
     await user.save();
 
-    await transporter.sendMail({
-      to: email,
-      subject: "Your OTP",
-      text: `Your OTP is ${user.otp}. It expires in 10 minutes.`,
-    });
-
-    res.status(200).send({ message: "OTP sent", OTP: user.otp });
+    res.status(200).json({ message: `Password for ${user.email} has been reset successfully.` });
   } catch (err) {
-    console.error(err);
-    res.status(500).send({ message: err.message });
+    console.error('Error resetting password:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
@@ -175,7 +221,7 @@ const updateUserProfile = async (req, res) => {
 };
 
 
-module.exports = { register, login, forgotPassword, verifyOtp, getMe, updateUserProfile};
+module.exports = { register, login, resetUserPassword, verifyOtp, getMe, updateUserProfile};
 
 // const register = async (req, res) => {
 //   try {
