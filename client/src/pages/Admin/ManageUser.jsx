@@ -13,8 +13,16 @@ const ManageUser = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/login");
+    navigate("/");
   };
+
+  const [dateTime, setDateTime] = useState(new Date());
+  
+    // Update date/time every second
+    useEffect(() => {
+      const timer = setInterval(() => setDateTime(new Date()), 1000);
+      return () => clearInterval(timer);
+    }, []);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -93,7 +101,9 @@ const ManageUser = () => {
             <MenuIcon className="h-6 w-6 text-blue-900 md:hidden" />
             <h2 className="text-xl font-semibold text-blue-900">Manage Users</h2>
           </div>
-          <div className="text-sm text-gray-600 hidden md:block">Welcome back, Admin 👋</div>
+          <div className="text-sm text-gray-600">
+            {dateTime.toLocaleDateString()} {dateTime.toLocaleTimeString()}
+          </div>
         </header>
 
         <div className="p-6 flex-1 overflow-auto">

@@ -13,8 +13,14 @@ const Reports = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/login");
+    navigate("/");
   };
+
+  const [dateTime, setDateTime] = useState(new Date());
+    useEffect(() => {
+      const timer = setInterval(() => setDateTime(new Date()), 1000);
+      return () => clearInterval(timer);
+    }, []);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -65,7 +71,9 @@ const Reports = () => {
             <MenuIcon className="h-6 w-6 text-blue-900 md:hidden" />
             <h2 className="text-xl font-semibold text-blue-900">Reports</h2>
           </div>
-          <div className="text-sm text-gray-600 hidden md:block">Welcome back, Admin 👋</div>
+          <div className="text-sm text-gray-600">
+            {dateTime.toLocaleDateString()} {dateTime.toLocaleTimeString()}
+          </div>
         </header>
 
         {/* Reports Content */}

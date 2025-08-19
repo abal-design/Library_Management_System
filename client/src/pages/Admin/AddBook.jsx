@@ -16,6 +16,12 @@ const AddBook = () => {
     available: "",
   });
   const [coverFile, setCoverFile] = useState(null);
+  const handleRemoveImage = () => {
+    setCoverFile(null);
+    // Reset the file input too
+    document.getElementById("cover-input").value = "";
+  };
+
 
   useEffect(() => {
     const timer = setInterval(() => setDateTime(new Date()), 1000);
@@ -71,7 +77,7 @@ const AddBook = () => {
           <Link to="/admin/manage-user" className="hover:bg-blue-800 px-3 py-2 rounded">Manage Users</Link>
           <Link to="/admin/reports" className="hover:bg-blue-800 px-3 py-2 rounded">Reports</Link>
           <Link to="/admin/reset-password" className="hover:bg-blue-800 px-3 py-2 rounded">Reset User Password</Link>
-          <button onClick={handleLogout} className="bg-yellow-400 text-black mb-3 fixed bottom-0 px-4 py-2 rounded hover:bg-yellow-300 transition mt-auto">Logout</button>
+          <button onClick={handleLogout} className="bg-yellow-400 cursor-pointer text-black mb-3 fixed bottom-0 px-4 py-2 rounded hover:bg-yellow-300 transition mt-auto">Logout</button>
         </nav>
       </aside>
 
@@ -94,6 +100,7 @@ const AddBook = () => {
           <button onClick={() => navigate("/admin/add-book")} className="hover:bg-yellow-300 bg-gray-600 text-gray-100 px-3 py-1 rounded transition">➕ Add Book</button>
           <button onClick={() => navigate("/admin/update-book")} className="bg-white text-gray-800 hover:bg-yellow-300 px-3 py-1 rounded transition">✏️ Update</button>
           <button onClick={() => navigate("/admin/delete-book")} className="bg-white text-gray-800 hover:bg-yellow-300 px-3 py-1 rounded transition">🗑️ Delete</button>
+          <button onClick={() => navigate("/admin/borrow-page")} className="bg-white text-gray-800 hover:bg-yellow-300 px-3 py-1 rounded transition"> 📥 Borrow Request </button>
         </div>
 
         {/* Add Book Form */}
@@ -117,16 +124,28 @@ const AddBook = () => {
             {/* Cover Image Upload */}
             <div>
               <label className="block font-medium capitalize">Cover Image</label>
+              <div className="flex gap-2">
+
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
-                className="border p-2 w-full rounded"
-              />
+                className="border flex-col p-2 w-full rounded"
+                />  
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="bg-red-500 cursor-pointer text-white px-3 py-1 rounded hover:bg-red-600"
+              >
+                Remove
+              </button> 
+              
+            </div>
+              
             </div>
 
             <div className="flex justify-center">
-              <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+              <button type="submit" className="bg-blue-500 cursor-pointer hover:bg-blue-600 text-white px-4 py-2 rounded">
                 Save Book
               </button>
             </div>

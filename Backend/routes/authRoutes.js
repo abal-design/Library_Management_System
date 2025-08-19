@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../middleware/authMiddleware');
-const upload = require('../middleware/upload'); // shared upload
+const upload = require('../middleware/uploadMiddleware'); // shared upload
 const { register, login, verifyOtp, resetUserPassword } = require('../controllers/authcontroller');
 
 // Routes

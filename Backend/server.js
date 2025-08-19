@@ -7,6 +7,7 @@ const borrowRoutes = require('./routes/borrowRoutes');
 const { errorHandler } = require('./middleware/errorMiddleware');
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
+const path = require("path");
 const userRoutes = require("./routes/userRoutes"); // import your user model
 const reportRoutes = require('./routes/reportRoutes');
 
@@ -25,9 +26,11 @@ app.use('/uploads', express.static('uploads'));
 app.use('/api/reports', reportRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/books', bookRoutes);
-app.use('/api/borrow', borrowRoutes);
 app.use('/api/users', userRoutes);
+app.use("/api/borrows", borrowRoutes);
 
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Global error handler
 app.use(errorHandler);
 

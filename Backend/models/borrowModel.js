@@ -5,8 +5,12 @@ const borrowSchema = new mongoose.Schema(
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     bookId: { type: mongoose.Schema.Types.ObjectId, ref: "Book", required: true },
     borrowDate: { type: Date, default: Date.now },
-    returnDate: { type: Date, default: null },
-    status: { type: String, enum: ["Borrowed", "Returned"], default: "Borrowed" },
+    returnDate: { type: Date }, // ✅ submit date (15 days later)
+    status: { 
+    type: String, 
+    enum: ["Pending", "Borrowed", "Returned", "Declined"], 
+    default: "Pending" 
+},
   },
   { timestamps: true }
 );

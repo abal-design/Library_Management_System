@@ -9,6 +9,7 @@ const bookSchema = new mongoose.Schema(
     category: { type: String },
     available: { type: Number, required: true, min: 0 },
     coverImage: { type: String, default: "" }, // URL of the book cover image
+    description:{type: String},
   },
   { timestamps: true }
 );

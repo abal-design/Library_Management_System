@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Logo from "../../assets/logo.png";
@@ -29,6 +29,13 @@ const Signup = () => {
       [name]: value
     }));
   };
+
+
+  const [dateTime, setDateTime] = useState(new Date());
+    useEffect(() => {
+      const timer = setInterval(() => setDateTime(new Date()), 1000);
+      return () => clearInterval(timer);
+    }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -71,7 +78,9 @@ const Signup = () => {
             <MenuIcon className="h-6 w-6 text-blue-900 md:hidden" />
             <h2 className="text-xl font-semibold text-blue-900">Add User</h2>
           </div>
-          <div className="text-sm text-gray-600 hidden md:block">Welcome, <br/> Add member 👨‍💻</div>
+          <div className="text-sm text-gray-600">
+            {dateTime.toLocaleDateString()} {dateTime.toLocaleTimeString()}
+          </div>
         </header>
 
 

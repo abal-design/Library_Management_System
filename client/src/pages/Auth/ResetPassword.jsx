@@ -25,6 +25,11 @@ const ResetUserPassword = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
   const validateForm = () => {
     const { email, newPassword } = formData;
     if (!email || !newPassword) {
@@ -79,6 +84,12 @@ const ResetUserPassword = () => {
           <Link to="/admin/reports" className="hover:bg-blue-800 px-3 py-2 rounded">Reports</Link>
           <Link to="/admin/reset-password" className="hover:bg-blue-800 bg-blue-800 px-3 py-2 rounded">Reset User Password</Link>
         </nav>
+        <button
+          onClick={handleLogout}
+          className="bg-yellow-400 m-6 text-black px-4 py-2 rounded hover:bg-yellow-300 transition"
+        >
+          Logout
+        </button>
       </aside>
 
       {/* Main Content */}

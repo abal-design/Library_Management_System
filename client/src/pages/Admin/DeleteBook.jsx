@@ -8,7 +8,6 @@ const DeleteBook = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dateTime, setDateTime] = useState(new Date());
-
   const navigate = useNavigate();
 
   // Fetch all books
@@ -27,8 +26,6 @@ const DeleteBook = () => {
 
   useEffect(() => {
     fetchBooks();
-
-    // Update date & time every second
     const timer = setInterval(() => setDateTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
@@ -36,28 +33,28 @@ const DeleteBook = () => {
   // Logout handler
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/login");
+    navigate("/");
   };
 
-  // Delete book handler
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this book?")) return;
+const handleDelete = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this book?")) return;
 
-    try {
-      const token = localStorage.getItem("token");
-      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      await axios.delete(`/api/books/${id}`, config);
-      setBooks((prev) => prev.filter((book) => book._id !== id));
-      alert("Book deleted successfully!");
-    } catch (error) {
-      console.error("Error deleting book:", error);
-      alert("Failed to delete book.");
-    }
-  };
+  try {
+    const token = localStorage.getItem("token");
+    const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+    await axios.delete(`/api/books/${id}`, config);
 
+    setBooks((prev) => prev.filter((book) => book._id !== id));
+    alert("Book deleted successfully!");
+  } catch (error) {
+    console.error("Error deleting book:", error.response?.data || error.message);
+    alert(error.response?.data?.message || error.message || "Failed to delete book.");
+  }
+};
   if (loading) {
     return <p className="text-center text-gray-600">Loading books...</p>;
   }
+
 
   return (
     <div className="min-h-screen flex bg-gray-100 text-gray-800">
@@ -74,6 +71,7 @@ const DeleteBook = () => {
           <Link to="/admin/manage-user" className="hover:bg-blue-800 px-3 py-2 rounded"> Manage Users </Link>
           <Link to="/admin/reports" className="hover:bg-blue-800 px-3 py-2 rounded">Reports</Link>
           <Link to="/admin/reset-password" className="hover:bg-blue-800 px-3 py-2 rounded">Reset User Password</Link>
+          <button onClick={handleLogout} className="bg-yellow-400 cursor-pointer text-black mb-3 fixed bottom-0 px-4 py-2 rounded hover:bg-yellow-300 transition mt-auto">Logout</button>
         </nav>
           
       </aside>
@@ -116,6 +114,12 @@ const DeleteBook = () => {
             className="bg-gray-600 text-gray-100 hover:bg-yellow-300 px-3 py-1 rounded transition"
           >
             🗑️ Delete
+          </button>
+          <button
+              onClick={() => navigate("/admin/borrow-page")}
+              className="bg-white text-gray-800 hover:bg-yellow-300 px-3 py-1 rounded transition"
+            >
+            📥 Borrow Request
           </button>
         </div>
 

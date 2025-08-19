@@ -42,12 +42,17 @@ const Login = () => {
   
     try {
       const res = await axios.post("/api/auth/login", { email, password });
-      const { token, role, user } = res.data;
-    
+      const { token, role, name, user } = res.data;
+
+     
       localStorage.setItem("token", token);
-      localStorage.setItem("role", role);
-      localStorage.setItem("userId", user._id); // <-- use _id instead of id
-    
+      // localStorage.setItem("token", res.data.token);
+      localStorage.setItem("name", res.data.user.name);
+      localStorage.setItem("role", res.data.user.role);
+      localStorage.setItem("profilePicture", res.data.user.profilePicture || "");
+
+   
+
       // Redirect based on role (case-insensitive)
       if (role.toLowerCase() === "librarian") navigate("/admin/dashboard");
       else if (role.toLowerCase() === "borrower") navigate("/user/dashboard");

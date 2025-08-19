@@ -75,7 +75,7 @@ const UpdateBook = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/login");
+    navigate("/");
   };
 
   return (
@@ -93,7 +93,9 @@ const UpdateBook = () => {
           <Link to="/admin/manage-user" className="hover:bg-blue-800 px-3 py-2 rounded"> Manage Users </Link>
           <Link to="/admin/reports" className="hover:bg-blue-800 px-3 py-2 rounded">Reports</Link>
           <Link to="/admin/reset-password" className="hover:bg-blue-800 px-3 py-2 rounded">Reset User Password</Link>
+          <button onClick={handleLogout} className="bg-yellow-400 cursor-pointer text-black mb-3 fixed bottom-0 px-4 py-2 rounded hover:bg-yellow-300 transition mt-auto">Logout</button>
         </nav>
+
       </aside>
 
       {/* Main Content */}
@@ -137,6 +139,12 @@ const UpdateBook = () => {
             className="bg-white text-gray-800 hover:bg-yellow-300 px-3 py-1 rounded transition"
           >
             🗑️ Delete
+          </button>
+          <button
+            onClick={() => navigate("/admin/borrow-page")}
+            className="bg-white text-gray-800 hover:bg-yellow-300 px-3 py-1 rounded transition"
+          >
+          📥 Borrow Request
           </button>
         </div>
 

@@ -11,48 +11,60 @@ const getBooks = async (req, res) => {
   }
 };
 
-// Create a new book
-const createBook = async (req, res) => {
+// // Create a new book
+// const createBook = async (req, res) => {
+//   try {
+//     const { title, author, category, isbn, quantity, available } = req.body;
+//     const coverImage = req.file ? req.file.filename : null; // store filename
+
+//     const book = await Book.create({
+//       title,
+//       author,
+//       category,
+//       isbn,
+//       quantity,
+//       available,
+//       coverImage
+//     });
+
+//     res.status(201).json(book);
+//   } catch (error) {
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
+
+
+
+
+
+
+
+//Add book
+const addBook = async (req, res) => {
   try {
     const { title, author, category, isbn, quantity, available } = req.body;
-    const coverImage = req.file ? req.file.filename : null; // store filename
 
-    const book = await Book.create({
+    if (!title || !author || !category || !isbn) {
+      return res.status(400).json({ message: "Please provide all required fields" });
+    }
+
+    const newBook = new Book({
       title,
       author,
       category,
       isbn,
       quantity,
       available,
-      coverImage
+      coverImage: req.file ? `/uploads/${req.file.filename}` : "", // ✅ save relative path
     });
 
-    res.status(201).json(book);
+    await newBook.save();
+    res.status(201).json({ message: "Book added successfully", book: newBook });
   } catch (error) {
+    console.error("Error adding book:", error.message);
     res.status(500).json({ message: "Server error" });
   }
 };
-
-
-
-
-
-// const createBook = async (req, res) => {
-//   try {
-//     const { title, author, isbn, category, quantity, available, coverImage } = req.body;
-
-//     if (!title || !author || !isbn || !category || quantity == null || available == null) {
-//       return res.status(400).json({ message: "Please provide all required fields" });
-//     }
-
-//     const book = new Book({ title, author, isbn, category, quantity, available, coverImage });
-//     await book.save();
-//     res.status(201).json(book);
-//   } catch (error) {
-//     console.error("Error creating book:", error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
 
 // Update a book
 const updateBook = async (req, res) => {
@@ -80,4 +92,4 @@ const deleteBook = async (req, res) => {
   }
 };
 
-module.exports = { getBooks, createBook, updateBook, deleteBook };
+module.exports = { getBooks, updateBook, addBook,  deleteBook };

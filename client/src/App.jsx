@@ -12,7 +12,10 @@ import Report from './pages/Admin/Report'
 import AddBook from './pages/Admin/AddBook'
 import UpdateBook from './pages/Admin/UpdateBook'
 import DeleteBook from './pages/Admin/DeleteBook'
+import BorrowRequestPage from "./pages/Admin/BorrowRequestPage";
 import axios from 'axios';
+import ContactUs from './pages/User/Contact'
+import BorrowerBook from './pages/User/BorrowerBook'
 import ResetPassword from "./pages/Auth/ResetPassword";
 
 
@@ -28,9 +31,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Login/>} />
         <Route path="/register" element={<Register/>}/>
-        {/* <Route path="/forgot" element={<Forgot/>}/>
-        <Route path="/otp" element={<Otp/>}/>
-        <Route path="/resetpassword" element={<ResetPassword/>}/> */}
+        <Route path="/user/borrower" element={<BorrowerBook/>}/>
+        <Route path="/user/contact" element={<ContactUs/>}/>
+        <Route path="/admin/borrow-page" element={<BorrowRequestPage/>}/>
         <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
         <Route path="/admin/manage-book" element={<ManageBook/>}/>
         <Route path="/admin/manage-user" element={<ManageUser/>}/>

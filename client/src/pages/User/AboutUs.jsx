@@ -14,7 +14,7 @@ const AboutUs = () => {
             About Our Library
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            We are more than just a collection of books — we are a vibrant
+            We are more than just a collection of books. We are a vibrant
             community of readers, learners, and knowledge seekers. Our mission
             is to make learning accessible, enjoyable, and inspiring for
             everyone.

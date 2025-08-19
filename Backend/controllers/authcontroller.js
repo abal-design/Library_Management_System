@@ -4,8 +4,8 @@ const jwt = require('jsonwebtoken');
 const otpUtils = require("../utils/otpUtils");
 const nodemailer = require("nodemailer");
 
-// Generate JWT token including user id and role
-const generateToken = (user) => 
+// JWT token including user id and role for Details
+const generateToken = (user) =>
   jwt.sign(
     { id: user._id, role: user.role },  // includes role
     process.env.JWT_SECRET, 
@@ -86,7 +86,7 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id, role: user.role,  },
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
@@ -94,10 +94,11 @@ const login = async (req, res) => {
     res.status(200).json({
       token,
       role: user.role,
+      
       user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
+        name: user.name, 
+        role: user.role,
+        profilePicture: user.profilePicture, // assuming you have this field
       },
     });
   } catch (err) {

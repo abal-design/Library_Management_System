@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./Navbar";
+import { useNavigate } from "react-router-dom";
 import Footer from "./Footer";
 import axios from "axios";
 import PromotionCarousel from "./PromotionCarousel"; // import the carousel component
@@ -8,6 +9,8 @@ const UserDashboard = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState("Student"); // Placeholder name, can decode from token
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -85,8 +88,10 @@ const UserDashboard = () => {
                   <h3 className="text-lg font-semibold text-gray-900">{book.title}</h3>
                   <p className="text-sm text-gray-600">{book.author}</p>
                   <p className="text-xs text-gray-500 mb-4">{book.category || "N/A"}</p>
-                  <button className="w-full bg-blue-900 text-white py-2 rounded-md hover:bg-blue-800 transition">
-                    Borrow Now
+                  <button
+                  onClick={() => navigate("/user/book")} 
+                  className="w-full bg-blue-900 text-white py-2 rounded-md hover:bg-blue-800 transition">
+                    Get now...
                   </button>
                 </div>
               </div>

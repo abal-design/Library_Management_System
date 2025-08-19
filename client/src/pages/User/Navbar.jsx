@@ -48,8 +48,21 @@ const Navbar = () => {
         </Link>
         
         <Link
-          to="/user/aboutus" className="text-white font-medium hover:text-yellow-300 transition">
+          to="/user/aboutus" 
+          className="text-white font-medium hover:text-yellow-300 transition">
           About Us
+        </Link>
+
+        <Link
+          to="/user/contact" 
+          className="text-white font-medium hover:text-yellow-300 transition">
+          Contact Us
+        </Link>
+
+        <Link
+          to="/user/borrower" 
+          className="text-white font-medium hover:text-yellow-300 transition">
+          Borrow Details
         </Link>
       </div>
 

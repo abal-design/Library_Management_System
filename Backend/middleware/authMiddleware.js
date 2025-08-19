@@ -26,16 +26,34 @@ const protect = async (req, res, next) => {
   }
 };
 
-// Authorize roles
+// Authorize roles (case-insensitive)
 const authorize = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
+    if (!req.user || !req.user.role) {
+      return res.status(401).json({ message: 'User role not found' });
+    }
+
+    const userRole = req.user.role.toLowerCase(); // normalize user role
+    const allowedRoles = roles.map(r => r.toLowerCase()); // normalize allowed roles
+
+    if (!allowedRoles.includes(userRole)) {
       return res
         .status(403)
         .json({ message: `User role ${req.user.role} not authorized` });
     }
+
     next();
   };
 };
+// const authorize = (...roles) => {
+//   return (req, res, next) => {
+//     if (!roles.includes(req.user.role)) {
+//       return res
+//         .status(403)
+//         .json({ message: `User role ${req.user.role} not authorized` });
+//     }
+//     next();
+//   };
+// };
 
 module.exports = { protect, authorize };
