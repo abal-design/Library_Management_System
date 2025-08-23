@@ -16,6 +16,8 @@ const UpdateBook = () => {
     available: ""
   });
   const [dateTime, setDateTime] = useState(new Date());
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const navigate = useNavigate();
 
@@ -49,6 +51,8 @@ const UpdateBook = () => {
       category: book.category,
       available: book.available
     });
+    setError("");
+    setSuccess("");
   };
 
   const handleChange = (e) => {
@@ -60,22 +64,41 @@ const UpdateBook = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(
+      const res = await axios.put(
         `http://localhost:5000/api/books/${editingBook}`,
         formData
       );
-      alert("Book updated successfully!");
+
+      setSuccess(res.data.message || "Book updated successfully!");
+      setError("");
       setEditingBook(null);
       fetchBooks();
     } catch (err) {
       console.error("Error updating book:", err);
-      alert("Failed to update book.");
+      setSuccess("");
+      setError(
+        err.response?.data?.message ||
+          "Failed to update book. Please try again."
+      );
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        await axios.post(
+          "/api/users/logout",
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+    } catch (err) {
+      console.error("Logout error:", err.response?.data || err.message);
+    } finally {
+      localStorage.removeItem("token");
+      navigate("/");
+    }
   };
 
   return (
@@ -95,7 +118,6 @@ const UpdateBook = () => {
           <Link to="/admin/reset-password" className="hover:bg-blue-800 px-3 py-2 rounded">Reset User Password</Link>
           <button onClick={handleLogout} className="bg-yellow-400 cursor-pointer text-black mb-3 fixed bottom-0 px-4 py-2 rounded hover:bg-yellow-300 transition mt-auto">Logout</button>
         </nav>
-
       </aside>
 
       {/* Main Content */}
@@ -119,21 +141,18 @@ const UpdateBook = () => {
           >
             📖 View All
           </button>
-
           <button
             onClick={() => navigate("/admin/add-book")}
             className="hover:bg-yellow-300 bg-white text-gray-800 px-3 py-1 rounded transition"
           >
             ➕ Add Book
           </button>
-
           <button
             onClick={() => navigate("/admin/update-book")}
             className=" bg-gray-600 text-gray-100 hover:bg-yellow-300 px-3 py-1 rounded transition"
           >
             ✏️ Update
           </button>
-
           <button
             onClick={() => navigate("/admin/delete-book")}
             className="bg-white text-gray-800 hover:bg-yellow-300 px-3 py-1 rounded transition"
@@ -144,12 +163,15 @@ const UpdateBook = () => {
             onClick={() => navigate("/admin/borrow-page")}
             className="bg-white text-gray-800 hover:bg-yellow-300 px-3 py-1 rounded transition"
           >
-          📥 Borrow Request
+            📥 Borrow Request
           </button>
         </div>
 
         {/* Main Content Area */}
         <section className="flex-1 p-8">
+          {/* Error/Success messages */}
+          {error && <div className="bg-red-200 text-red-800 p-3 rounded mb-4">{error}</div>}
+          {success && <div className="bg-green-200 text-green-800 p-3 rounded mb-4">{success}</div>}
 
           {/* Edit Form */}
           {editingBook && (
@@ -157,65 +179,15 @@ const UpdateBook = () => {
               onSubmit={handleUpdate}
               className="bg-white p-6 rounded-xl shadow-md mb-8 max-w-lg mx-auto space-y-4"
             >
-              <input
-                type="text"
-                name="title"
-                placeholder="Title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                className="w-full border p-3 rounded"
-              />
-              <input
-                type="text"
-                name="author"
-                placeholder="Author"
-                value={formData.author}
-                onChange={handleChange}
-                required
-                className="w-full border p-3 rounded"
-              />
-              <input
-                type="text"
-                name="isbn"
-                placeholder="ISBN"
-                value={formData.isbn}
-                onChange={handleChange}
-                required
-                className="w-full border p-3 rounded"
-              />
-              <input
-                type="number"
-                name="quantity"
-                placeholder="Quantity"
-                value={formData.quantity}
-                onChange={handleChange}
-                required
-                className="w-full border p-3 rounded"
-              />
-              <input
-                type="text"
-                name="category"
-                placeholder="Category"
-                value={formData.category}
-                onChange={handleChange}
-                className="w-full border p-3 rounded"
-              />
-              <input
-                type="number"
-                name="available"
-                placeholder="Available"
-                value={formData.available}
-                onChange={handleChange}
-                required
-                className="w-full border p-3 rounded"
-              />
+              <input type="text" name="title" placeholder="Title" value={formData.title} onChange={handleChange} required className="w-full border p-3 rounded" />
+              <input type="text" name="author" placeholder="Author" value={formData.author} onChange={handleChange} required className="w-full border p-3 rounded" />
+              <input type="text" name="isbn" placeholder="ISBN" value={formData.isbn} onChange={handleChange} required className="w-full border p-3 rounded" />
+              <input type="number" name="quantity" placeholder="Quantity" value={formData.quantity} onChange={handleChange} required className="w-full border p-3 rounded" />
+              <input type="text" name="category" placeholder="Category" value={formData.category} onChange={handleChange} className="w-full border p-3 rounded" />
+              <input type="number" name="available" placeholder="Available" value={formData.available} onChange={handleChange} required className="w-full border p-3 rounded" />
 
               <div className="flex justify-center">
-                <button
-                  type="submit"
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded"
-                >
+                <button type="submit" className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded">
                   💾 Save Changes
                 </button>
               </div>
@@ -223,40 +195,39 @@ const UpdateBook = () => {
           )}
 
           {/* Books Table */}
-          
-            <table className="min-w-full border border-gray-300 shadow-md rounded-lg">
-              <thead>
-                <tr className="bg-blue-900 text-white">
-                  <th className="border border-gray-300 px-4 py-2 text-left">Title</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Author</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">ISBN</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Quantity</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Category</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Available</th>
-                  <th className="border border-gray-300 px-4 py-2 text-left">Actions</th>
+          <table className="min-w-full border border-gray-300 shadow-md rounded-lg">
+            <thead>
+              <tr className="bg-blue-900 text-white">
+                <th className="border border-gray-300 px-4 py-2 text-left">Title</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Author</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">ISBN</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Quantity</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Category</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Available</th>
+                <th className="border border-gray-300 px-4 py-2 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {books.map((book) => (
+                <tr key={book._id} className="hover:bg-gray-100">
+                  <td className="border border-gray-300 px-4 py-2">{book.title}</td>
+                  <td className="border border-gray-300 px-4 py-2">{book.author}</td>
+                  <td className="border border-gray-300 px-4 py-2">{book.isbn}</td>
+                  <td className="border border-gray-300 px-4 py-2">{book.quantity}</td>
+                  <td className="border border-gray-300 px-4 py-2">{book.category || "-"}</td>
+                  <td className="border border-gray-300 px-4 py-2">{book.available}</td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    <button
+                      onClick={() => handleEditClick(book)}
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded"
+                    >
+                      Edit
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {books.map((book) => (
-                  <tr key={book._id} className="hover:bg-gray-100">
-                    <td className="border border-gray-300 px-4 py-2">{book.title}</td>
-                    <td className="border border-gray-300 px-4 py-2">{book.author}</td>
-                    <td className="border border-gray-300 px-4 py-2">{book.isbn}</td>
-                    <td className="border border-gray-300 px-4 py-2">{book.quantity}</td>
-                    <td className="border border-gray-300 px-4 py-2">{book.category || "-"}</td>
-                    <td className="border border-gray-300 px-4 py-2">{book.available}</td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      <button
-                        onClick={() => handleEditClick(book)}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded"
-                      >
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>         
+              ))}
+            </tbody>
+          </table>
         </section>
       </div>
     </div>

@@ -16,6 +16,7 @@ import BorrowRequestPage from "./pages/Admin/BorrowRequestPage";
 import axios from 'axios';
 import ContactUs from './pages/User/Contact'
 import BorrowerBook from './pages/User/BorrowerBook'
+import ProfilePage from './pages/User/Profile'
 import ResetPassword from "./pages/Auth/ResetPassword";
 
 
@@ -41,6 +42,7 @@ function App() {
         <Route path="/user/dashboard" element={<UserDashboard/>}/>
         <Route path="/user/book" element={<Book/>}/>
         <Route path="/user/aboutus" element={<AboutUs/>}/>
+        <Route path="/user/profile" element={<ProfilePage/>}/>
         <Route path="/admin/add-book" element={<AddBook/>}/>
         <Route path="/admin/reset-password" element={<ResetPassword/>}/>
         <Route path="/admin/delete-book" element={<DeleteBook/>}/>

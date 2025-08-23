@@ -14,51 +14,91 @@ const AddBook = () => {
     isbn: "",
     quantity: "",
     available: "",
+    description: "",
+    coverImage: "", // store image link directly
   });
-  const [coverFile, setCoverFile] = useState(null);
-  const handleRemoveImage = () => {
-    setCoverFile(null);
-    // Reset the file input too
-    document.getElementById("cover-input").value = "";
-  };
-
 
   useEffect(() => {
     const timer = setInterval(() => setDateTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
+  // ✅ Logout function
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        await axios.post(
+          "/api/users/logout",
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+    } catch (err) {
+      console.error("Logout error:", err.response?.data || err.message);
+    } finally {
+      localStorage.removeItem("token");
+      navigate("/");
+    }
   };
 
+  // ✅ Handle input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFileChange = (e) => {
-    setCoverFile(e.target.files[0]);
-  };
-
+  // ✅ Handle form submission with validation
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 🔹 Validation rules
+    if (!formData.title.trim() || !formData.author.trim()) {
+      alert("Title and Author are required.");
+      return;
+    }
+
+    if (!/^\d{10}(\d{3})?$/.test(formData.isbn)) {
+      alert("ISBN must be 10 or 13 digits.");
+      return;
+    }
+
+    if (formData.quantity < 0 || formData.available < 0) {
+      alert("Quantity and Available must be non-negative.");
+      return;
+    }
+
+    if (parseInt(formData.available) > parseInt(formData.quantity)) {
+      alert("Available books cannot exceed total quantity.");
+      return;
+    }
+
+    if (formData.coverImage && !/^https?:\/\/.+\..+/.test(formData.coverImage)) {
+      alert("Cover image must be a valid URL (starting with http/https).");
+      return;
+    }
+
+    if (formData.description && formData.description.length > 500) {
+      alert("Description cannot exceed 500 characters.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       const config = {
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
+        headers: { Authorization: `Bearer ${token}` },
       };
 
-      const payload = new FormData();
-      Object.keys(formData).forEach((key) => payload.append(key, formData[key]));
-      if (coverFile) payload.append("coverImage", coverFile);
-
-      await axios.post("/api/books", payload, config);
+      await axios.post("/api/books", formData, config);
       alert("Book added successfully!");
       navigate("/admin/manage-book");
     } catch (error) {
       console.error("Error adding book:", error.response?.data || error.message);
-      alert("Failed to add book");
+        
+      if (error.response?.data?.message) {
+        alert(error.response.data.message); // show backend error message
+      } else {
+        alert("❌ Failed to add book");
+      }
     }
   };
 
@@ -71,10 +111,10 @@ const AddBook = () => {
           <h1 className="text-2xl font-bold text-center">LMS Admin</h1>
         </div>
         <nav className="flex flex-col gap-4 p-6 flex-1">
-          <Link to="/admin/dashboard" className="hover:bg-blue-800 px-3 py-2 rounded">Dashboard</Link>
+          <Link to="/admin/dashboard" className="hover:bg-blue-800 px-3 py-2 rounded"> Dashboard</Link>
           <Link to="/register" className="hover:bg-blue-800 px-3 py-2 rounded">Add User</Link>
-          <Link to="/admin/manage-book" className="hover:bg-blue-800 bg-blue-800 px-3 py-2 rounded">Manage Books</Link>
-          <Link to="/admin/manage-user" className="hover:bg-blue-800 px-3 py-2 rounded">Manage Users</Link>
+          <Link to="/admin/manage-book" className="hover:bg-blue-800 bg-blue-800 px-3 py-2 rounded"> Manage Books</Link>
+          <Link to="/admin/manage-user" className="hover:bg-blue-800 px-3 py-2 rounded"> Manage Users </Link>
           <Link to="/admin/reports" className="hover:bg-blue-800 px-3 py-2 rounded">Reports</Link>
           <Link to="/admin/reset-password" className="hover:bg-blue-800 px-3 py-2 rounded">Reset User Password</Link>
           <button onClick={handleLogout} className="bg-yellow-400 cursor-pointer text-black mb-3 fixed bottom-0 px-4 py-2 rounded hover:bg-yellow-300 transition mt-auto">Logout</button>
@@ -106,46 +146,27 @@ const AddBook = () => {
         {/* Add Book Form */}
         <div className="bg-white mt-6 p-6 rounded shadow-md w-120 mx-auto">
           <form onSubmit={handleSubmit} className="space-y-4">
-            {["title", "author", "category", "isbn", "quantity", "available"].map((field) => (
+            {["title", "author", "category", "isbn", "quantity", "available", "description", "coverImage"].map((field) => (
               <div key={field}>
                 <label className="block font-medium capitalize">{field}</label>
                 <input
-                  type={field.includes("quantity") || field.includes("available") ? "number" : "text"}
+                  type={field === "quantity" || field === "available" ? "number" : "text"}
                   name={field}
                   value={formData[field]}
                   onChange={handleChange}
-                  required
+                  required={field !== "description" && field !== "coverImage"} // optional for description & image
                   min={field === "quantity" || field === "available" ? 0 : undefined}
+                  maxLength={field === "description" ? 500 : undefined}
                   className="border p-2 w-full rounded"
                 />
               </div>
             ))}
 
-            {/* Cover Image Upload */}
-            <div>
-              <label className="block font-medium capitalize">Cover Image</label>
-              <div className="flex gap-2">
-
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="border flex-col p-2 w-full rounded"
-                />  
-              <button
-                type="button"
-                onClick={handleRemoveImage}
-                className="bg-red-500 cursor-pointer text-white px-3 py-1 rounded hover:bg-red-600"
-              >
-                Remove
-              </button> 
-              
-            </div>
-              
-            </div>
-
             <div className="flex justify-center">
-              <button type="submit" className="bg-blue-500 cursor-pointer hover:bg-blue-600 text-white px-4 py-2 rounded">
+              <button
+                type="submit"
+                className="bg-blue-500 cursor-pointer hover:bg-blue-600 text-white px-4 py-2 rounded"
+              >
                 Save Book
               </button>
             </div>

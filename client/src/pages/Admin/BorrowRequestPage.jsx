@@ -34,9 +34,22 @@ const BorrowRequestsPage = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        await axios.post(
+          "/api/users/logout",
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+    } catch (err) {
+      console.error("Logout error:", err.response?.data || err.message);
+    } finally {
+      localStorage.removeItem("token");
+      navigate("/");
+    }
   };
 
   // 🔹 Fixed handleAction
@@ -85,12 +98,7 @@ const BorrowRequestsPage = () => {
           <Link to="/admin/manage-user" className="hover:bg-blue-800 px-3 py-2 rounded"> Manage Users </Link>
           <Link to="/admin/reports" className="hover:bg-blue-800 px-3 py-2 rounded">Reports</Link>
           <Link to="/admin/reset-password" className="hover:bg-blue-800 px-3 py-2 rounded">Reset User Password</Link>
-          <button
-            onClick={handleLogout}
-            className="bg-yellow-400 cursor-pointer text-black mb-3 fixed bottom-0 px-4 py-2 rounded hover:bg-yellow-300 transition mt-auto"
-          >
-            Logout
-          </button>
+          <button onClick={handleLogout} className="bg-yellow-400 cursor-pointer text-black mb-3 fixed bottom-0 px-4 py-2 rounded hover:bg-yellow-300 transition mt-auto">Logout</button>
         </nav>
       </aside>
 
@@ -154,6 +162,7 @@ const BorrowRequestsPage = () => {
                 <th className="py-3 px-4 border-b">Book</th>
                 <th className="py-3 px-4 border-b">Date</th>
                 <th className="py-3 px-4 border-b">Submit Date</th>
+                <th className="py-3 px-4 border-b">Fine</th>
                 <th className="py-3 px-4 border-b">Status</th>
                 <th className="py-3 px-4 border-b">Action</th>
               </tr>
@@ -161,10 +170,11 @@ const BorrowRequestsPage = () => {
             <tbody>
               {requests.map((req) => (
                 <tr key={req._id} className="hover:bg-amber-50">
-                  <td className="py-2 px-4 border-b">{req.userId?.name}</td>
-                  <td className="py-2 px-4 border-b">{req.bookId?.title}</td>
+                  <td className="py-2 px-4 border-b"> {req.userId?.name}</td>
+                  <td className="py-2 px-4 border-b"> {req.bookId?.title}</td>
                   <td className="py-2 px-4 border-b"> {new Date(req.borrowDate).toLocaleDateString()} </td>
                   <td className="py-2 px-4 border-b"> {req.borrowDate ? new Date(new Date(req.borrowDate).getTime() + 15 * 24 * 60 * 60 * 1000).toLocaleDateString() : "Not Set"} </td>
+                  <td className="py-2 px-4 border-b"> {req.fine > 0 ? `Rs. ${req.fine}` : "No Fine"} </td>
 
                   <td className="py-2 px-4 border-b">
                     <span

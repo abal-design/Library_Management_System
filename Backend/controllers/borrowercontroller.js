@@ -8,18 +8,35 @@ const borrowBook = async (req, res) => {
 
     if (!bookId) return res.status(400).json({ message: "Book ID is required" });
 
+    // Calculate fine if overdue (Rs.10/day after due date)
+    if (borrow.returnDate > borrow.dueDate) {
+      const diffDays = Math.ceil((borrow.returnDate - borrow.dueDate) / (1000 * 60 * 60 * 24));
+      borrow.fine = diffDays * 10;
+    }
+
     const book = await Book.findById(bookId);
     if (!book) return res.status(404).json({ message: "Book not found" });
     if (book.quantity <= 0)
       return res.status(400).json({ message: "Book out of stock" });
 
+    // Reduce available quantity immediately
+    book.quantity -= 1;
+    await book.save();
+
+
+    
+
     const borrow = await Borrow.create({
       userId: req.user.id,
       bookId,
-      status: "Pending",
+      status: "Pending", // librarian will later update to "Borrowed"
     });
 
-    res.status(201).json({ message: "Borrow request sent", borrow });
+    res.status(201).json({
+      message: "Borrow request sent",
+      borrow,
+      remainingQuantity: book.quantity, // return updated quantity
+    });
   } catch (err) {
     console.error("❌ borrowBook error:", err);
     res.status(500).json({ message: "Server error" });
@@ -36,29 +53,55 @@ const returnBook = async (req, res) => {
     if (borrow.status !== "Borrowed")
       return res.status(400).json({ message: "Book is not borrowed" });
 
+    // Set return date
     borrow.status = "Returned";
     borrow.returnDate = new Date();
+
+    // 📌 Fine calculation
+    const finePerDay = 10; // change as needed
+    const dueDate = new Date(borrow.dueDate);
+    const returnedDate = new Date(borrow.returnDate);
+
+    let fine = 0;
+    if (returnedDate > dueDate) {
+      const overdueMs = returnedDate - dueDate;
+      const overdueDays = Math.ceil(overdueMs / (1000 * 60 * 60 * 24));
+      fine = overdueDays * finePerDay;
+    }
+
+    borrow.fine = fine; // store fine in DB
     await borrow.save();
 
+    // Increase available quantity again
     const book = await Book.findById(borrow.bookId);
     if (book) {
       book.quantity += 1;
       await book.save();
     }
 
-    res.json({ message: "Book returned successfully", borrow });
+    res.json({
+      message: "Book returned successfully",
+      borrow,
+      fine,
+      updatedQuantity: book?.quantity || 0,
+    });
   } catch (err) {
     console.error("❌ returnBook error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
+
+
+
+
+
 // Get all borrow records (librarian)
 const getBorrowRecords = async (req, res) => {
   try {
     const records = await Borrow.find()
       .populate("userId", "name email")
-      .populate("bookId", "title author");
+      .populate("bookId", "title author coverImage"); // ✅ include coverImage
     res.json(records);
   } catch (err) {
     console.error("❌ getBorrowRecords error:", err);
@@ -71,7 +114,7 @@ const getUserBorrows = async (req, res) => {
   try {
     const records = await Borrow.find({ userId: req.user.id }).populate(
       "bookId",
-      "title author"
+      "title author coverImage" // ✅ include coverImage
     );
     res.json(records);
   } catch (err) {

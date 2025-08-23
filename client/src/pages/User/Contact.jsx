@@ -19,8 +19,7 @@ const ContactUs = () => {
     e.preventDefault();
     setStatus("Sending...");
     try {
-      // Example: send form data to your backend API
-      // await axios.post("/api/contact", formData);
+      
 
       setStatus("Message sent successfully!");
       setFormData({ name: "", email: "", message: "" });
@@ -34,64 +33,90 @@ const ContactUs = () => {
     <div className="flex flex-col min-h-screen">
       <Navbar />
 
-      <main className="flex-grow bg-gray-50 px-6 py-12">
-        <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">Contact Us</h1>
-          <p className="text-gray-600 mb-8">
-            Have a question or feedback? Fill out the form below and we'll get back to you as soon as possible.
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-r from-blue-900 to-indigo-800 text-white py-20 text-center overflow-hidden">
+        <div className="relative z-10 max-w-7xl mx-auto px-6">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact Us</h1>
+          <p className="text-lg md:text-xl">
+            Have questions or feedback? We’d love to hear from you!
           </p>
+        </div>
+        {/* Background overlay */}
+        <div className="absolute inset-0 opacity-10 bg-contact-hero bg-cover bg-center pointer-events-none"></div>
+      </section>
 
-          <div className="grid md:grid-cols-2 gap-8">
+      {/* Main Contact Section */}
+      <main className="flex-grow bg-gray-50 px-6 py-12">
+        <div className="max-w-6xl mx-auto bg-white shadow-md rounded-lg p-8">
+          <div className="grid md:grid-cols-2 gap-12">
             {/* Contact Info */}
-            <div className="space-y-4">
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Get in Touch</h2>
+              <p className="text-gray-600">
+                Feel free to contact us for any questions, suggestions, or support.
+              </p>
               <div>
-                <h2 className="font-semibold text-lg text-gray-700">Address</h2>
-                <p className="text-gray-500"> Dulari-4, Morang, Nepal</p>
+                <h3 className="font-semibold text-gray-700">Address</h3>
+                <p className="text-gray-500">Dulari-4, Morang, Nepal</p>
               </div>
               <div>
-                <h2 className="font-semibold text-lg text-gray-700">Email</h2>
+                <h3 className="font-semibold text-gray-700">Email</h3>
                 <p className="text-gray-500">themailofabal@gmail.com</p>
               </div>
               <div>
-                <h2 className="font-semibold text-lg text-gray-700">Phone</h2>
+                <h3 className="font-semibold text-gray-700">Phone</h3>
                 <p className="text-gray-500">+977 9746953529</p>
+              </div>
+
+              {/* Google Map */}
+              <div className="mt-6">
+                <iframe
+                  title="Itahari International College"
+                  src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d2592.4013385861085!2d87.30165875605881!3d26.655098843928805!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2snp!4v1755878935912!5m2!1sen!2snp"
+                  width="100%"
+                  height="300"
+                  className="border-0 rounded-md"
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
               </div>
             </div>
 
             {/* Contact Form */}
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <form className="space-y-4 text-gray-500" onSubmit={handleSubmit}>
               <div>
-                <label className="block text-black mb-1">Name</label>
+                <label className="block text-gray-800 mb-1">Name</label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:text-black"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-black mb-1">Email</label>
+                <label className="block text-gray-800 mb-1">Email</label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:text-black"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-black mb-1">Message</label>
+                <label className="block text-gray-800 mb-1">Message</label>
                 <textarea
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
                   rows="5"
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:text-black"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                   required
                 ></textarea>
               </div>

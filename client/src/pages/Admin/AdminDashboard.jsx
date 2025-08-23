@@ -9,13 +9,10 @@ const API_BASE_URL = "http://localhost:5000"; // Adjust if needed
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  
 
   const [stats, setStats] = useState({
     totalBooks: 0,
     registeredUsers: 0,
-    booksBorrowed: 0,
-    overdueReturns: 0,
   });
   const [admin, setAdmin] = useState({
     name: "",
@@ -26,50 +23,66 @@ const Dashboard = () => {
   const [error, setError] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
 
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        await axios.post(
+          "/api/users/logout",
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+    } catch (err) {
+      console.error("Logout error:", err.response?.data || err.message);
+    } finally {
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
+      localStorage.removeItem("token");
+      navigate("/");
+    }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError("");
-    
+
       const token = localStorage.getItem("token");
-      const name = localStorage.getItem('name');
-      const profilePicture = localStorage.getItem('profilePicture');
-      setAdmin({...admin,name: name, profilePicture:profilePicture})
+      const name = localStorage.getItem("name");
+      const profilePicture = localStorage.getItem("profilePicture");
+      setAdmin({ ...admin, name: name, profilePicture: profilePicture });
+
       if (!token) {
-        navigate("/login");
+        navigate("/");
         return;
       }
-    
+
       const config = { headers: { Authorization: `Bearer ${token}` } };
-    
+
       try {
-        // Fetch both at the same time
         const [statsRes, userRes] = await Promise.allSettled([
           axios.get(`${API_BASE_URL}/api/reports/stats`, config),
           axios.get(`${API_BASE_URL}/api/auth/me`, config),
         ]);
-      
-        // Handle stats
+
         if (statsRes.status === "fulfilled") {
           setStats(statsRes.value.data);
         } else {
-          console.error("Stats API error:", statsRes.reason?.response?.data || statsRes.reason?.message);
+          console.error(
+            "Stats API error:",
+            statsRes.reason?.response?.data || statsRes.reason?.message
+          );
         }
-      
-        // Handle admin info
+
         if (userRes.status === "fulfilled") {
           setAdmin(userRes.value.data);
         } else {
-          console.error("User API error:", userRes.reason?.response?.data || userRes.reason?.message);
+          console.error(
+            "User API error:",
+            userRes.reason?.response?.data || userRes.reason?.message
+          );
         }
-      
-        // If both failed
+
         if (statsRes.status === "rejected" && userRes.status === "rejected") {
           setError("Failed to load data.");
         }
@@ -80,7 +93,7 @@ const Dashboard = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, [navigate]);
 
@@ -107,27 +120,21 @@ const Dashboard = () => {
       <aside className="w-64 bg-blue-900 text-white hidden md:flex flex-col">
         <div className="p-6 border-b border-blue-700">
           <img src={Logo} alt="Logo" className="h-16 mx-auto" />
-          <h1 className="text-2xl font-bold text-center mt-2">LMS Admin</h1>
+          <h1 className="text-2xl font-bold text-center">LMS Admin</h1>
         </div>
         <nav className="flex flex-col gap-4 p-6 flex-1">
-          <Link to="/admin/dashboard" className="hover:bg-blue-800 bg-blue-800 px-3 py-2 rounded"> Dashboard</Link>
+          <Link to="/admin/dashboard" className="hover:bg-blue-800 px-3 py-2 rounded"> Dashboard</Link>
           <Link to="/register" className="hover:bg-blue-800 px-3 py-2 rounded">Add User</Link>
-          <Link to="/admin/manage-book" className="hover:bg-blue-800 px-3 py-2 rounded"> Manage Books</Link>
+          <Link to="/admin/manage-book" className="hover:bg-blue-800 bg-blue-800 px-3 py-2 rounded"> Manage Books</Link>
           <Link to="/admin/manage-user" className="hover:bg-blue-800 px-3 py-2 rounded"> Manage Users </Link>
           <Link to="/admin/reports" className="hover:bg-blue-800 px-3 py-2 rounded">Reports</Link>
           <Link to="/admin/reset-password" className="hover:bg-blue-800 px-3 py-2 rounded">Reset User Password</Link>
+          <button onClick={handleLogout} className="bg-yellow-400 cursor-pointer text-black mb-3 fixed bottom-0 px-4 py-2 rounded hover:bg-yellow-300 transition mt-auto">Logout</button>
         </nav>
-        
-        <button
-          onClick={handleLogout}
-          className="bg-yellow-400 m-6 text-black px-4 py-2 rounded hover:bg-yellow-300 transition"
-        >
-          Logout
-        </button>
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex pb-8 flex-col">
         {/* Header */}
         <header className="bg-white shadow-md p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -156,33 +163,38 @@ const Dashboard = () => {
           <p className="text-sm">{admin.email}</p>
         </div>
 
-        {/* Stats */}
-        <section className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white rounded shadow p-6 text-center">
-            <h3 className="text-lg font-bold mb-2">Total Books</h3>
-            <p className="text-3xl font-extrabold text-blue-900">
-              {stats.totalBooks}
-            </p>
-          </div>
-          <div className="bg-white rounded shadow p-6 text-center">
-            <h3 className="text-lg font-bold mb-2">Registered Users</h3>
-            <p className="text-3xl font-extrabold text-blue-900">
-              {stats.registeredUsers}
-            </p>
-          </div>
-          <div className="bg-white rounded shadow p-6 text-center">
-            <h3 className="text-lg font-bold mb-2">Books Borrowed</h3>
-            <p className="text-3xl font-extrabold text-blue-900">
-              {stats.booksBorrowed}
-            </p>
-          </div>
-          <div className="bg-white rounded shadow p-6 text-center">
-            <h3 className="text-lg font-bold mb-2">Overdue Returns</h3>
-            <p className="text-3xl font-extrabold text-blue-900">
-              {stats.overdueReturns}
-            </p>
-          </div>
-        </section>
+        {/* 📢 Announcement Section */}
+        <div className="mx-4 md:mx-8 mt-6 bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-md shadow">
+          <h3 className="text-lg font-semibold text-yellow-800 mb-2 flex items-center">
+            📢 Announcement
+          </h3>
+          <p className="text-gray-800 mb-2 font-medium">
+            Library System Upgrade Completed 🎉
+          </p>
+          <ul className="list-disc list-inside text-gray-700 text-sm mb-2">
+            <li>📚 Faster book search with improved filters</li>
+            <li>📊 Advanced reporting for borrowing & returns</li>
+            <li>🔔 Smart reminders for overdue books</li>
+            <li>👥 Better user management controls</li>
+          </ul>
+          <p className="text-sm text-gray-700">
+            <strong>Action Required:</strong> Please review pending borrow
+            requests and ensure your profile information is up to date.
+          </p>
+        </div>
+  
+        {/* 📝 Notices Section */}
+        <div className="mx-4 md:mx-8 mt-6 bg-blue-50 border-l-4 border-blue-400 p-6 rounded-md shadow">
+          <h3 className="text-lg font-semibold text-blue-800 mb-2 flex items-center">
+            📝 Notices
+          </h3>
+          <ul className="list-disc list-inside text-gray-700 text-sm space-y-2">
+            <li>📅 <strong>Library Holiday:</strong> Closed on <em>September 10</em> for maintenance.</li>
+            <li>👥 <strong>Staff Meeting:</strong> Librarians’ monthly meeting on <em>September 10, 3 PM</em> in the Main Hall.</li>
+            <li>⚠️ <strong>Overdue Reminder:</strong> Overdue fines apply after <em>3 days of late return</em>.</li>
+          </ul>
+        </div>
+
       </main>
     </div>
   );

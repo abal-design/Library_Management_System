@@ -11,6 +11,12 @@ const userSchema = new mongoose.Schema(
       default: "Borrower",
       required: true,
     },
+    status:{
+      type: String,
+      enum:["Active", "Inactive"],
+      default: "Inactive",
+      required: true,
+    },
     profilePicture: { type: String, default: "" },
     otp:{type:String, default:null},
     otpExpires:{type:Date , default:null}

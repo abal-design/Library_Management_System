@@ -18,7 +18,7 @@ const Signup = () => {
   const handleLogout = () => {
   // example: remove token
   localStorage.removeItem('token');
-  navigate('/login');
+  navigate('/');
   };
 
 
@@ -54,21 +54,17 @@ const Signup = () => {
       {/* Header */}
       <aside className="w-64 bg-blue-900 text-white hidden md:flex flex-col">
         <div className="p-6 border-b border-blue-700">
-          <img src={Logo} alt="Logo" className="h-16 ml-16 items-center" />
-          <h1 className="text-2xl font-bold ml-9">LMS Admin</h1>
-          
+          <img src={Logo} alt="Logo" className="h-16 mx-auto" />
+          <h1 className="text-2xl font-bold text-center mt-2">LMS Admin</h1>
         </div>
-        <nav className="flex flex-col gap-4 p-6">
-          <Link to="/admin/dashboard" className="hover:bg-blue-800 px-3 py-2 rounded">Dashboard</Link>
-          <Link to="/register" className="hover:bg-blue-800 bg-blue-800 active:bg-blue-800 px-3 py-2 rounded">Add User</Link>
-          <Link to="/admin/manage-book" className="hover:bg-blue-800 px-3 py-2 rounded">Manage Books</Link>
-          <Link to="/admin/manage-user" className="hover:bg-blue-800 px-3 py-2 rounded">Manage Users</Link>
+        <nav className="flex flex-col gap-4 p-6 flex-1">
+          <Link to="/admin/dashboard" className="hover:bg-blue-800 px-3 py-2 rounded"> Dashboard</Link>
+          <Link to="/register" className="hover:bg-blue-800 bg-blue-800 px-3 py-2 rounded">Add User</Link>
+          <Link to="/admin/manage-book" className="hover:bg-blue-800 px-3 py-2 rounded"> Manage Books</Link>
+          <Link to="/admin/manage-user" className="hover:bg-blue-800 px-3 py-2 rounded"> Manage Users </Link>
           <Link to="/admin/reports" className="hover:bg-blue-800 px-3 py-2 rounded">Reports</Link>
-          <button
-          onClick={handleLogout}
-          className="bg-yellow-400 mb-3 fixed bottom-0 text-black px-4 py-2 rounded hover:bg-yellow-300 transition">
-          Logout
-          </button>
+          <Link to="/admin/reset-password" className="hover:bg-blue-800 px-3 py-2 rounded">Reset User Password</Link>
+          <button onClick={handleLogout} className="bg-yellow-400 cursor-pointer text-black mb-3 fixed bottom-0 px-4 py-2 rounded hover:bg-yellow-300 transition mt-auto">Logout</button>
         </nav>
       </aside>
       <main className="flex-1 flex flex-col">

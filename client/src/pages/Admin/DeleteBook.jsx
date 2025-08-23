@@ -31,26 +31,39 @@ const DeleteBook = () => {
   }, []);
 
   // Logout handler
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        await axios.post(
+          "/api/users/logout",
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+    } catch (err) {
+      console.error("Logout error:", err.response?.data || err.message);
+    } finally {
+      localStorage.removeItem("token");
+      navigate("/");
+    }
   };
 
-const handleDelete = async (id) => {
-  if (!window.confirm("Are you sure you want to delete this book?")) return;
-
-  try {
-    const token = localStorage.getItem("token");
-    const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-    await axios.delete(`/api/books/${id}`, config);
-
-    setBooks((prev) => prev.filter((book) => book._id !== id));
-    alert("Book deleted successfully!");
-  } catch (error) {
-    console.error("Error deleting book:", error.response?.data || error.message);
-    alert(error.response?.data?.message || error.message || "Failed to delete book.");
-  }
-};
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this book?")) return;
+  
+    try {
+      const token = localStorage.getItem("token");
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      await axios.delete(`/api/books/${id}`, config);
+    
+      setBooks((prev) => prev.filter((book) => book._id !== id));
+      alert("Book deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting book:", error.response?.data || error.message);
+      alert(error.response?.data?.message || error.message || "Failed to delete book.");
+    }
+  };
   if (loading) {
     return <p className="text-center text-gray-600">Loading books...</p>;
   }
@@ -73,7 +86,6 @@ const handleDelete = async (id) => {
           <Link to="/admin/reset-password" className="hover:bg-blue-800 px-3 py-2 rounded">Reset User Password</Link>
           <button onClick={handleLogout} className="bg-yellow-400 cursor-pointer text-black mb-3 fixed bottom-0 px-4 py-2 rounded hover:bg-yellow-300 transition mt-auto">Logout</button>
         </nav>
-          
       </aside>
 
       {/* Main Content */}

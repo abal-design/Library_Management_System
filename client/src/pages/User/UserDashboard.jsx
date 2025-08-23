@@ -5,6 +5,30 @@ import Footer from "./Footer";
 import axios from "axios";
 import PromotionCarousel from "./PromotionCarousel"; // import the carousel component
 
+const promotions = [
+  {
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Adidas_Logo.svg/800px-Adidas_Logo.svg.png",
+    text: "🔥 Adidas Sale: Up to 30% off!",
+  },
+  {
+    image: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",
+    text: "📱 iPhone 15 Pro Available Now!",
+  },
+  {
+    image: "https://imgs.search.brave.com/DxmeW5qgtcberATgMhnUpbkIgW_7jWfDTUeO8wqtO9g/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNTBiNzZlOTkz/MmQ3OGQzYTkxNDYz/ZjUzN2QyMjQ3ZWVh/NjA2ZTVmODJkNDE3/YmQ2MWNkOGE1OTcw/YTNjNWFmMS93d3cu/ZGFyYXoucGsv",
+    text: "🛒 Daraz Mega Deals This Week!",
+  },
+  {
+    image: "https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png",
+    text: "⚡ Tesla Model Y Pre-Order Open!",
+  },
+  {
+    image: "https://imgs.search.brave.com/Zy_79_MoC-LakZROAxmriA7Pr1U5e0wcqq8DLsCppig/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvODc5YTNjMjQ0/NDJmOGIwMmQwYjNk/N2IzZjU4ZTU2MzVm/YjAxZDljODM3ZTk5/NjE0MTgzOTYxY2U0/ZGY3YWUwMS9hYm91/dC5uaWtlLmNvbS8",
+    text: "👟 Nike Sneakers – Buy 1 Get 1!",
+  },
+];
+
+
 const UserDashboard = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -114,6 +138,54 @@ const UserDashboard = () => {
           the library if you wish to join.
         </p>
       </section>
+
+
+        <section className="relative bg-blue-800 py-10">
+        {/* Section title */}
+        <div className="max-w-7xl mx-auto px-6 text-center mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-white">
+            🔥 Latest Promotions
+          </h2>
+          <p className="text-white/80 mt-2">
+            Grab the latest deals from top brands like Adidas, iPhone, Daraz, Tesla, and more! Don’t miss out!
+          </p>
+        </div>
+
+        {/* Scrolling promotions */}
+        <div className="overflow-hidden">
+          <div className="flex animate-scroll whitespace-nowrap items-center">
+            {promotions.concat(promotions).map((promo, index) => (
+              <div
+                key={index}
+                className="flex items-center mx-4 gap-3 bg-white/10 px-4 py-2 rounded-md flex-shrink-0"
+                style={{ minWidth: "fit-content" }} // ensures box width adapts to content
+              >
+                <img
+                  src={promo.image}
+                  alt={promo.text}
+                  className="h-12 w-12 object-cover rounded-full flex-shrink-0"
+                />
+                <span className="text-white font-semibold">{promo.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+          
+        {/* Animation styles */}
+        <style>
+          {`
+            @keyframes scroll {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+            .animate-scroll {
+              display: inline-flex;
+              animation: scroll 12s linear infinite;
+            }
+          `}
+        </style>
+      </section>
+
 
       {/* Footer */}
       <Footer />
