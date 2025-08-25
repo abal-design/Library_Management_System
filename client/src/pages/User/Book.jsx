@@ -2,6 +2,12 @@ import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode"; // make sure you import it
+
+
+  // console.log(decoded); // See all fields
+
+// Now you can send userId to the backend in your request body or params
 
 const BookPage = () => {
   const [books, setBooks] = useState([]);
@@ -9,6 +15,7 @@ const BookPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -17,6 +24,7 @@ const BookPage = () => {
         const res = await axios.get("http://localhost:5000/api/books", {
           headers: { Authorization: `Bearer ${token}` },
         });
+
         setBooks(res.data);
       } catch (err) {
         setError("⚠️ Failed to load books. Please try again later.");
@@ -28,38 +36,43 @@ const BookPage = () => {
     fetchBooks();
   }, []);
 
-  const handleBorrow = async (bookId) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("❌ You must be logged in to borrow a book");
-        return;
-      }
-
-      const res = await axios.post(
-        "http://localhost:5000/api/borrows",
-        { bookId },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      alert("✅ Borrow request sent successfully!");
-      console.log(res.data);
-    } catch (err) {
-      console.error(err.response?.data || err);
-      alert(
-        `❌ Failed to send borrow request: ${
-          err.response?.data?.message || err.message
-        }`
-      );
+const handleBorrow = async (bookId) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("❌ You must be logged in to borrow a book");
+      return;
     }
-  };
+
+
+    const decoded = jwtDecode(token);
+    const userId = decoded.id; // 👈 extract userId from token
+
+    const res = await axios.post(
+      "http://localhost:5000/api/borrows",
+      { bookId, userId }, // 👈 send both
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    alert("✅ Borrow request sent successfully!");
+    console.log(res.data);
+  } catch (err) {
+    console.error(err.response?.data || err);
+    alert(
+      `❌ Failed to send borrow request: ${
+        err.response?.data?.message || err.message
+      }`
+    );
+  }
+};
+
 
   // Helper function to check availability
   const isAvailable = (quantity) => quantity > 0;
 
   const filteredBooks = books.filter(
     (book) =>
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      book.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book._id.includes(searchQuery)
   );
 
@@ -71,7 +84,9 @@ const BookPage = () => {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-900 to-indigo-800 text-white py-20 text-center">
         <div className="max-w-7xl mx-auto px-6">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">📚 Explore Our Books</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            📚 Explore Our Books
+          </h1>
           <p className="text-lg md:text-xl">
             Find your next read and manage your library easily.
           </p>
@@ -111,7 +126,9 @@ const BookPage = () => {
                   alt={book.title}
                   className="w-full h-48 object-cover rounded-md mb-4"
                 />
-                <h2 className="text-lg font-semibold text-gray-900">{book.title}</h2>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {book.title}
+                </h2>
                 <p className="text-gray-600 text-sm">By {book.author}</p>
                 <p className="text-gray-500 text-xs">ISBN: {book.isbn}</p>
                 <p className="text-gray-700 font-medium">
@@ -132,7 +149,7 @@ const BookPage = () => {
                   <button
                     onClick={() => handleBorrow(book._id)}
                     disabled={!isAvailable(book.available)}
-                    className={`mt-auto px-4 py-2 w-[60%] text-white rounded-lg transition-colors duration-300 ease-in-out shadow-sm hover:shadow-md ${
+                    className={`px-4 py-2 w-[60%] text-white rounded-lg transition-colors duration-300 ease-in-out shadow-sm hover:shadow-md ${
                       isAvailable(book.available)
                         ? "bg-blue-600 hover:bg-blue-700"
                         : "bg-gray-400 cursor-not-allowed"
@@ -143,10 +160,10 @@ const BookPage = () => {
 
                   {/* Details Button */}
                   <button
-                    className="mt-auto px-4 py-2 w-[40%] bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 ease-in-out shadow-sm hover:shadow-md"
+                    className="px-4 py-2 w-[40%] bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 ease-in-out shadow-sm hover:shadow-md"
                     onClick={() => {
                       setSelectedBook(book);
-                      document.getElementById("bookModal").showModal();
+                      setIsModalOpen(true);
                     }}
                   >
                     Details...
@@ -158,10 +175,10 @@ const BookPage = () => {
         )}
       </main>
 
-      {/* Global Modal */}
-      <dialog id="bookModal" className="modal">
-        {selectedBook && (
-          <div className="modal-box max-w-md">
+      {/* Modal */}
+      {isModalOpen && selectedBook && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
             <h3 className="font-bold text-lg">{selectedBook.title}</h3>
             <img
               src={selectedBook.coverImage || "https://via.placeholder.com/150"}
@@ -181,14 +198,17 @@ const BookPage = () => {
               <strong>Description:</strong>{" "}
               {selectedBook.description || "No description available."}
             </p>
-            <div className="modal-action">
-              <form method="dialog">
-                <button className="btn bg-blue-500 text-white">Close</button>
-              </form>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Close
+              </button>
             </div>
           </div>
-        )}
-      </dialog>
+        </div>
+      )}
 
       {/* Footer */}
       <Footer />
