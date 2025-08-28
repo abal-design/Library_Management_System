@@ -11,6 +11,7 @@ import ManageUser from './pages/Admin/ManageUser'
 import Report from './pages/Admin/Report'
 import AddBook from './pages/Admin/AddBook'
 import UpdateBook from './pages/Admin/UpdateBook'
+import EditUser from "./pages/Admin/edit-user";
 import DeleteBook from './pages/Admin/DeleteBook'
 import BorrowRequestPage from "./pages/Admin/BorrowRequestPage";
 import axios from 'axios';
@@ -38,6 +39,7 @@ function App() {
         <Route path="/admin/dashboard" element={<AdminDashboard/>}/>
         <Route path="/admin/manage-book" element={<ManageBook/>}/>
         <Route path="/admin/manage-user" element={<ManageUser/>}/>
+        <Route path="/admin/edit-user/:userId" element={<EditUser />} />
         <Route path="/admin/reports" element={<Report/>}/>
         <Route path="/user/dashboard" element={<UserDashboard/>}/>
         <Route path="/user/book" element={<Book/>}/>

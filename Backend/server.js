@@ -29,8 +29,8 @@ app.use('/api/books', bookRoutes);
 app.use('/api/users', userRoutes);
 app.use("/api/borrows", borrowRoutes);
 
-
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use('/uploads', express.static('uploads'));
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Global error handler
 app.use(errorHandler);
 

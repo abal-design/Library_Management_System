@@ -6,10 +6,10 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
         {/* Links */}
         <nav className="flex gap-6 text-sm md:text-base">
-          <a href="#" className="hover:text-yellow-400 transition">
+          <a href="/user/aboutus" className="hover:text-yellow-400 transition">
             About Us
           </a>
-          <a href="#" className="hover:text-yellow-400 transition">
+          <a href="/user/contact" className="hover:text-yellow-400 transition">
             Contact
           </a>
           <a href="#" className="hover:text-yellow-400 transition">
@@ -25,7 +25,7 @@ const Footer = () => {
 
       {/* Copyright */}
       <div className="mt-6 text-center text-gray-300 text-sm">
-        © {new Date().getFullYear()} - All rights reserved by Library ManagementSystem
+        © {new Date().getFullYear()} - All rights reserved by Library Management System
       </div>
     </footer>
   );

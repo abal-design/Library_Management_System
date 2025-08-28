@@ -9,22 +9,27 @@ const promotions = [
   {
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Adidas_Logo.svg/800px-Adidas_Logo.svg.png",
     text: "🔥 Adidas Sale: Up to 30% off!",
+    url: "https://www.adidas.com" // Adidas official site
   },
   {
     image: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",
     text: "📱 iPhone 15 Pro Available Now!",
+    url: "https://www.apple.com/iphone-15-pro" // Apple iPhone page
   },
   {
     image: "https://imgs.search.brave.com/DxmeW5qgtcberATgMhnUpbkIgW_7jWfDTUeO8wqtO9g/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNTBiNzZlOTkz/MmQ3OGQzYTkxNDYz/ZjUzN2QyMjQ3ZWVh/NjA2ZTVmODJkNDE3/YmQ2MWNkOGE1OTcw/YTNjNWFmMS93d3cu/ZGFyYXoucGsv",
     text: "🛒 Daraz Mega Deals This Week!",
+    url: "https://www.daraz.com.np" // Daraz Nepal
   },
   {
     image: "https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png",
     text: "⚡ Tesla Model Y Pre-Order Open!",
+    url: "https://www.tesla.com/modely" // Tesla Model Y
   },
   {
     image: "https://imgs.search.brave.com/Zy_79_MoC-LakZROAxmriA7Pr1U5e0wcqq8DLsCppig/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvODc5YTNjMjQ0/NDJmOGIwMmQwYjNk/N2IzZjU4ZTU2MzVm/YjAxZDljODM3ZTk5/NjE0MTgzOTYxY2U0/ZGY3YWUwMS9hYm91/dC5uaWtlLmNvbS8",
     text: "👟 Nike Sneakers – Buy 1 Get 1!",
+    url: "https://www.nike.com" // Nike official
   },
 ];
 
@@ -153,23 +158,26 @@ const UserDashboard = () => {
 
         {/* Scrolling promotions */}
         <div className="overflow-hidden">
-          <div className="flex animate-scroll whitespace-nowrap items-center">
-            {promotions.concat(promotions).map((promo, index) => (
-              <div
-                key={index}
-                className="flex items-center mx-4 gap-3 bg-white/10 px-4 py-2 rounded-md flex-shrink-0"
-                style={{ minWidth: "fit-content" }} // ensures box width adapts to content
-              >
-                <img
-                  src={promo.image}
-                  alt={promo.text}
-                  className="h-12 w-12 object-cover rounded-full flex-shrink-0"
-                />
-                <span className="text-white font-semibold">{promo.text}</span>
-              </div>
-            ))}
-          </div>
+        <div className="flex animate-scroll whitespace-nowrap items-center">
+          {promotions.concat(promotions).map((promo, index) => (
+            <a
+              key={index}
+              href={promo.url} // <-- dynamic link
+              target="_blank" // open in new tab
+              rel="noopener noreferrer"
+              className="flex items-center mx-4 gap-3 bg-white/10 px-4 py-2 rounded-md flex-shrink-0 hover:bg-white/20 transition cursor-pointer"
+              style={{ minWidth: "fit-content" }}
+            >
+              <img
+                src={promo.image}
+                alt={promo.text}
+                className="h-12 w-12 object-cover rounded-full flex-shrink-0"
+              />
+              <span className="text-white font-semibold">{promo.text}</span>
+            </a>
+          ))}
         </div>
+      </div>
           
         {/* Animation styles */}
         <style>

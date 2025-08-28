@@ -5,26 +5,41 @@ const borrowModel = require("../models/borrowModel");
 // Borrow a book
 const borrowBook = async (req, res) => {
   try {
-    const { bookId, userId } = req.body; // <-- must match frontend
+    const { bookId, userId } = req.body;
     if (!bookId || !userId) {
       return res.status(400).json({ message: "Book ID and User ID required" });
     }
 
-    // Example: create borrow record
-    const borrow = await Borrow.create({
-      bookId: bookId,
-      userId: userId,
+    // 🔎 Find the book
+    const book = await Book.findById(bookId);
+    if (!book) {
+      return res.status(404).json({ message: "Book not found" });
+    }
+
+    // 📉 Decrease book quantity
+    book.quantity = book.quantity - 1;
+
+    // ✅ Create borrow record
+    const borrow = new Borrow({
+      bookId,
+      userId,
       status: "Pending",
     });
 
-    await borrow.save()
+    await borrow.save();
+    await book.save();
 
-    res.status(201).json(borrow);
+    res.status(201).json({
+      message: "Book borrowed successfully",
+      borrow,
+      updatedQuantity: book.quantity,
+    });
   } catch (error) {
-    console.error("Borrow error:", error);
+    console.error("❌ Borrow error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 
@@ -56,14 +71,16 @@ const returnBook = async (req, res) => {
     }
 
     borrow.fine = fine;
-    await borrow.save();
 
-    // Increase stock back
+    // ✅ Increase book quantity back by 1
     const book = await Book.findById(borrow.bookId);
     if (book) {
       book.quantity += 1;
       await book.save();
     }
+
+
+    await borrow.save();
 
     res.json({
       message: "Book returned successfully",
@@ -121,18 +138,33 @@ const updateBorrowStatus = async (req, res) => {
     const { status } = req.body;
     borrow.status = status;
 
+    // Handle stock & dates
     if (status === "Borrowed") {
       const borrowDate = borrow.borrowDate || new Date();
       borrow.borrowDate = borrowDate;
       const dueDate = new Date(borrowDate);
       dueDate.setDate(dueDate.getDate() + 15); // +15 days
       borrow.returnDate = dueDate;
+
+      // decrease stock
+      const book = await Book.findById(borrow.bookId);
+      if (!book) {
+        return res.status(404).json({ message: "Book not found" });
+      }
+      if (book.quantity <= 0) {
+        return res.status(400).json({ message: "Book is out of stock" });
+      }
+      book.quantity -= 1;
+      await book.save();
     }
 
     if (status === "Returned") {
-      // keep the original due date (submit date)
-      // OR you could clear it:
-      // borrow.returnDate = null;
+      // keep original due date for history
+      const book = await Book.findById(borrow.bookId);
+      if (book) {
+        book.quantity += 1;
+        await book.save();
+      }
     }
 
     if (status === "Declined") {
@@ -153,3 +185,21 @@ module.exports = {
   returnBook,
   updateBorrowStatus,
 };
+
+
+
+
+
+
+
+// // ✅ Check if user already has a non-returned book
+    // const existingBorrow = await Borrow.findOne({
+    //   userId,
+    //   status: { $in: ["Pending", "Borrowed"] } // still active
+    // });
+
+    // if (existingBorrow) {
+    //   return res.status(400).json({
+    //     message: "You already have an active borrow request. Return it before borrowing another."
+    //   });
+    // }

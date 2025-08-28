@@ -177,8 +177,8 @@ const handleBorrow = async (bookId) => {
 
       {/* Modal */}
       {isModalOpen && selectedBook && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+        <div className="fixed inset-0 bg-transparent flex justify-center items-center z-50">
+          <div className="bg-black text-white rounded-lg shadow-lg p-6 max-w-md w-full">
             <h3 className="font-bold text-lg">{selectedBook.title}</h3>
             <img
               src={selectedBook.coverImage || "https://via.placeholder.com/150"}
