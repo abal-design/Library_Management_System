@@ -12,34 +12,27 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const UserProfile = () => {
   const navigate = useNavigate();
 
-  const [user, setUser] = useState({
-    name: "",
-    email: "",
-    role: "",
-    profilePicture: "",
-  });
+  const [user, setUser] = useState([]);
   const [borrowHistory, setBorrowHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  // Load user info from localStorage instantly
+  const name = localStorage.getItem("name") || "";
+  const email = localStorage.getItem("email") || "";
+  const role = localStorage.getItem("role") || "";
+  const profilePicture = localStorage.getItem("profilePicture") || "";
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError("");
 
-      
-
       const token = localStorage.getItem("token");
       if (!token) {
         navigate("/");
         return;
       }
-
-      // Load user info from localStorage instantly
-      const name = localStorage.getItem("name");
-      const email = localStorage.getItem("email");
-      const role = localStorage.getItem("role");
-      const profilePicture = localStorage.getItem("profilePicture");
 
       setUser({ name, email, role, profilePicture });
 
@@ -95,41 +88,18 @@ const UserProfile = () => {
     <div className="flex flex-col bg-amber-50 min-h-screen">
       <Navbar />
 
-      <div className="bg-white rounded-lg shadow-md min-h-screen p-6 w-full max-w-3xl mx-auto my-6">
+      <div className="bg-white rounded-lg shadow-md h-100 p-6 w-full max-w-3xl mx-auto my-6">
         {/* Profile Info */}
         <div className="flex flex-col items-center mb-6">
           <img
-            src={user.profilePicture || defaultAvatar}
+            src={profilePicture || defaultAvatar}
             alt={user.name || "User"}
             className="h-24 w-24 rounded-full border-2 border-blue-900 object-cover mb-4"
             onError={(e) => (e.currentTarget.src = defaultAvatar)}
           />
-          <h2 className="text-2xl text-gray-600 font-bold">Name: {user.name}</h2>
-          <p className="text-gray-600">Email: {user.email}</p>
-          <p className="text-gray-500 text-sm">Role: {user.role}</p>
-        </div>
-
-        {/* Borrow History */}
-        <div className="mt-6">
-          <h3 className="text-xl text-gray-600 font-semibold mb-3">Borrow History</h3>
-          {Array.isArray(borrowHistory) && borrowHistory.length > 0 ? (
-            <ul className="divide-y divide-gray-200">
-              {borrowHistory.map((item, index) => (
-                <li key={index} className="py-2 flex justify-between">
-                  <span>{item.title}</span>
-                  <span
-                    className={`font-semibold ${
-                      item.returned ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {item.returned ? "Returned" : "Not Returned"}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500">No borrow history found.</p>
-          )}
+          <h2 className="text-2xl text-gray-600 font-bold">Name: {name}</h2>
+          <p className="text-gray-600">Email: {email}</p>
+          <p className="text-gray-500 text-sm">Role: {role}</p>
         </div>
       </div>
 

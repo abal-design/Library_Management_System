@@ -49,6 +49,7 @@ const Login = () => {
       // localStorage.setItem("token", res.data.token);
       localStorage.setItem("name", res.data.user.name);
       localStorage.setItem("role", res.data.user.role);
+      localStorage.setItem("email", res.data.user.email);
       localStorage.setItem("profilePicture", res.data.user.profilePicture || "");
 
    
